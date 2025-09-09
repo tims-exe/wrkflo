@@ -4,34 +4,10 @@
 import { addEdge, Background, Connection, Edge, Node, ReactFlow, useEdgesState, useNodesState } from "@xyflow/react";
 import "@xyflow/react/dist/style.css"
 import { useCallback } from "react";
-import TriggerButton from "../ui/TriggerButton";
+// import TriggerButton from "../ui/TriggerButton";
 import TelegramNode from "./nodes/TelegramNode";
-
-// const initialNodes: Node[] = [
-//   {
-//     id: "1",
-//     data: { label: 'Node 1' },
-//     position: { x: 0, y: 0 },
-//     style: { backgroundColor: '#525252', color: 'white', borderRadius: '1rem' }
-//   },
-//   {
-//     id: "2",
-//     data: { label: 'Node 2' },
-//     position: { x: 200, y: 200 },
-//     style: { backgroundColor: '#525252', color: 'white', borderRadius: '1rem' }
-//   },
-//   {
-//     id: "3",
-//     data: { label: 'Node 3' },
-//     position: { x: 200, y: 300 },
-//     style: { backgroundColor: '#525252', color: 'white', borderRadius: '1rem' }
-//   }
-// ];
-
-// const initialEdges: Edge[] = [
-//   { id: '1-2', source: "1", target: "2", sourceHandle: null, targetHandle: null }
-// ];
-
+import TelegramAction from "../ui/TelegramAction";
+import { NodeData } from "@/types/nodes";
 
 const nodeTypes = {
   'telegram-action': TelegramNode
@@ -52,16 +28,16 @@ export default function WorkflowComponent() {
     setEdges((prevEdges) => addEdge(connection, prevEdges));
   }, []);
 
-  function addNewNode(name: string) {
+  function addNewNode<T extends NodeData & Record<string, unknown>>(nodeType: string, data: T): void {
     const newNode: Node = {
       id: `${nodeId++}`,
-      data: { label: name },
+      type: nodeType,
+      data: data,
       position: { x: 300, y: 300 },
       style: { backgroundColor: '#525252', color: 'white', borderRadius: '1rem' }
     };
 
     setNodes((prev) => [...prev, newNode]);
-
     console.log(nodes)
     console.log(edges)
   }
@@ -84,12 +60,12 @@ export default function WorkflowComponent() {
       <div className="w-[300px] bg-transparent border-2 rounded-2xl border-neutral-500 px-5 py-5">
         <p>Triggers</p>
         <div className="w-full bg-neutral-600 h-0.5 my-3"></div>
-        <TriggerButton name="Manual" handleTriggerClick={addNewNode} />
-        <TriggerButton name="Webhook" handleTriggerClick={addNewNode} />
+        {/* <TriggerButton name="Manual" handleTriggerClick={addNewNode} /> */}
+        {/* <TriggerButton name="Webhook" handleTriggerClick={addNewNode} /> */}
         <p>Actions</p>
         <div className="w-full bg-neutral-600 h-0.5 my-3"></div>
-        <TriggerButton name="Telegram" handleTriggerClick={addNewNode} />
-        <TriggerButton name="Email" handleTriggerClick={addNewNode} />
+        <TelegramAction name="Telegram" handleNodeClick={addNewNode}/>
+        {/* <TriggerButton name="Email" handleTriggerClick={addNewNode} /> */}
       </div>
     </div>
   );
