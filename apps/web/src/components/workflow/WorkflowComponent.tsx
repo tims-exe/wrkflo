@@ -5,6 +5,7 @@ import { addEdge, Background, Connection, Edge, Node, ReactFlow, useEdgesState, 
 import "@xyflow/react/dist/style.css"
 import { useCallback } from "react";
 import TriggerButton from "../ui/TriggerButton";
+import TelegramNode from "./nodes/TelegramNode";
 
 // const initialNodes: Node[] = [
 //   {
@@ -31,6 +32,10 @@ import TriggerButton from "../ui/TriggerButton";
 //   { id: '1-2', source: "1", target: "2", sourceHandle: null, targetHandle: null }
 // ];
 
+
+const nodeTypes = {
+  'telegram-action': TelegramNode
+}
 
 const initialNodes: Node[] = []
 const initialEdges: Edge[] = []
@@ -71,6 +76,7 @@ export default function WorkflowComponent() {
           onEdgesChange={onEdgesChange}
           onConnect={onConnect}
           proOptions={{ hideAttribution: true }}
+          nodeTypes={nodeTypes}
         >
           <Background />
         </ReactFlow>
