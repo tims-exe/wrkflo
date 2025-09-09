@@ -1,8 +1,8 @@
 import { Router } from "express";
-import { AppDataSource } from "../config/data-source";
-import { User } from "../entities/User.js";
+import { UserController } from "../contollers/userController";
 
 export const userRouter: Router = Router()
+const userController = new UserController()
 
 userRouter.post('/signup', async (req, res) => {
     console.log('POST: /api/v1/users/signup')
@@ -16,11 +16,7 @@ userRouter.post('/signup', async (req, res) => {
             })
         }
 
-        const repo = AppDataSource.getMongoRepository(User)
-
-        const existing = await repo.findOne({
-            where: { email }
-        })
+        const existing = await userController.findUser(email)
         if (existing) {
             return res.json({
                 success: false,
@@ -28,17 +24,19 @@ userRouter.post('/signup', async (req, res) => {
             })
         }
 
-        const newUser = repo.create({
-            email, password
-        })
+        const savedUser = await userController.createUser(email, password)
 
-        const saved = repo.save(newUser)
+        if (savedUser) {
+            return res.json({
+                success: true,
+                message: "signup successful"
+            })
+        }
 
         return res.json({
-            success: true,
-            message: "signup successful"
+            success: false,
+            message: "signup failed"
         })
-
     } catch (error) {
         console.log('signup error ' ,error)
         return res.json({
@@ -48,7 +46,38 @@ userRouter.post('/signup', async (req, res) => {
     }
 })
 
-// userRouter.post('/signin')
+userRouter.post('/signin', async (req, res) => {
+    console.log("POST /api/v1/users/signin")
+    try {
+        const { email, password } = req.body
+
+        if (!email || !password) {
+            return res.json({
+                success: false,
+                message: "provide credentials"
+            })
+        }
+
+        const user = await userController.findUser(email)
+        if (user) {
+            return res.json({
+                success: true,
+                message: "signin successful",
+                data: user.email
+            })
+        }
+        return res.json({
+            success: false,
+            message: "signin failed"
+        })
+    } catch (error) {
+        console.log('signin error : ', error)
+        return res.json({
+            success: false,
+            message: "error in signin"
+        })
+    }
+})
 
 userRouter.get('/verify', async (req, res) => {
     console.log('GET /api/v1/users/verify')
@@ -61,12 +90,7 @@ userRouter.get('/verify', async (req, res) => {
                 message: "provide credentials"
             })
         }
-
-        const repo = AppDataSource.getMongoRepository(User)
-
-        const user = await repo.findOne({
-            where: { email }
-        })
+        const user = await userController.findUser(email)
 
         if (user) {
             return res.json({
