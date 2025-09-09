@@ -6,30 +6,35 @@ import "@xyflow/react/dist/style.css"
 import { useCallback } from "react";
 import TriggerButton from "../ui/TriggerButton";
 
-const initialNodes: Node[] = [
-  {
-    id: "1",
-    data: { label: 'Node 1' },
-    position: { x: 0, y: 0 },
-    style: { backgroundColor: '#525252', color: 'white', borderRadius: '1rem' }
-  },
-  {
-    id: "2",
-    data: { label: 'Node 2' },
-    position: { x: 200, y: 200 },
-    style: { backgroundColor: '#525252', color: 'white', borderRadius: '1rem' }
-  },
-  {
-    id: "3",
-    data: { label: 'Node 3' },
-    position: { x: 200, y: 300 },
-    style: { backgroundColor: '#525252', color: 'white', borderRadius: '1rem' }
-  }
-];
+// const initialNodes: Node[] = [
+//   {
+//     id: "1",
+//     data: { label: 'Node 1' },
+//     position: { x: 0, y: 0 },
+//     style: { backgroundColor: '#525252', color: 'white', borderRadius: '1rem' }
+//   },
+//   {
+//     id: "2",
+//     data: { label: 'Node 2' },
+//     position: { x: 200, y: 200 },
+//     style: { backgroundColor: '#525252', color: 'white', borderRadius: '1rem' }
+//   },
+//   {
+//     id: "3",
+//     data: { label: 'Node 3' },
+//     position: { x: 200, y: 300 },
+//     style: { backgroundColor: '#525252', color: 'white', borderRadius: '1rem' }
+//   }
+// ];
 
-const initialEdges: Edge[] = [
-  { id: '1-2', source: "1", target: "2", sourceHandle: null, targetHandle: null }
-];
+// const initialEdges: Edge[] = [
+//   { id: '1-2', source: "1", target: "2", sourceHandle: null, targetHandle: null }
+// ];
+
+
+const initialNodes: Node[] = []
+const initialEdges: Edge[] = []
+
 
 let nodeId = initialNodes.length + 1;
 
@@ -51,6 +56,9 @@ export default function WorkflowComponent() {
     };
 
     setNodes((prev) => [...prev, newNode]);
+
+    console.log(nodes)
+    console.log(edges)
   }
 
   return (
