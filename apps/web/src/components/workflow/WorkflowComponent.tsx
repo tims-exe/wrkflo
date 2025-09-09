@@ -3,55 +3,79 @@
 import { addEdge, Background, Connection, Controls, Edge, Node, ReactFlow, useEdgesState, useNodesState } from "@xyflow/react";
 import "@xyflow/react/dist/style.css"
 import { useCallback } from "react";
+import TriggerButton from "../ui/TriggerButton";
 
-const initialNodes:Node[] = [{
+const initialNodes: Node[] = [
+  {
     id: "1",
-    data: {
-        label: 'Node 1'
-    },
-    position: {x:0, y:0},
+    data: { label: 'Node 1' },
+    position: { x: 0, y: 0 },
     style: { backgroundColor: '#525252', color: 'white', borderRadius: '1rem' }
-},{
+  },
+  {
     id: "2",
-    data: {
-        label: 'Node 2'
-    },
-    position: {x:200, y:200},
+    data: { label: 'Node 2' },
+    position: { x: 200, y: 200 },
     style: { backgroundColor: '#525252', color: 'white', borderRadius: '1rem' }
-},{
+  },
+  {
     id: "3",
-    data: {
-        label: 'Node 3'
-    },
-    position: {x:200, y:300},
+    data: { label: 'Node 3' },
+    position: { x: 200, y: 300 },
     style: { backgroundColor: '#525252', color: 'white', borderRadius: '1rem' }
-}]
+  }
+];
 
 const initialEdges: Edge[] = [
-    {id: '1-2', source: "1", target: "2", sourceHandle: null, targetHandle: null}
-]
+  { id: '1-2', source: "1", target: "2", sourceHandle: null, targetHandle: null }
+];
 
+let nodeId = initialNodes.length + 1;
 
 export default function WorkflowComponent() {
 
-    const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes)
-    const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges)
+  const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes);
+  const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges);
 
-    // const onConnect = useCallback((connection: Connection) => {
-    //     const edge = {...connection, id: `${edges.length} + 1`};
+  const onConnect = useCallback((connection: Connection) => {
+    setEdges((prevEdges) => addEdge(connection, prevEdges));
+  }, []);
 
-    //     setEdges((prevEdges) => addEdge(edge, prevEdges))
-    // }, [])
+  function addNewNode(name: string) {
+    const newNode: Node = {
+      id: `${nodeId++}`,
+      data: { label: name },
+      position: { x: 300, y: 300 },
+      style: { backgroundColor: '#525252', color: 'white', borderRadius: '1rem' }
+    };
 
-    const onConnect = useCallback((connection: Connection) => {
-        setEdges((prevEdges) => addEdge(connection, prevEdges))
-    }, [])
+    setNodes((prev) => [...prev, newNode]);
+  }
 
-    return (
-    <div className="w-full h-[600px] border-2 border-neutral-500 rounded-2xl">
-      <ReactFlow nodes={nodes} edges={edges} onNodesChange={onNodesChange} onEdgesChange={onEdgesChange} onConnect={onConnect}>
-        <Background />
-      </ReactFlow>
+  return (
+    <div className="flex w-full gap-10">
+      <div className="w-full h-[600px] border-2 border-neutral-500 rounded-2xl">
+        <ReactFlow
+          nodes={nodes}
+          edges={edges}
+          onNodesChange={onNodesChange}
+          onEdgesChange={onEdgesChange}
+          onConnect={onConnect}
+          proOptions={{ hideAttribution: true }}
+        >
+          <Background />
+        </ReactFlow>
+      </div>
+      <div className="w-[300px] bg-transparent border-2 rounded-2xl border-neutral-500 px-5 py-5">
+        <p>Triggers</p>
+        <div className="w-full bg-neutral-600 h-0.5 my-3"></div>
+        <TriggerButton name="Manual" handleTriggerClick={addNewNode} />
+        <TriggerButton name="Webhook" handleTriggerClick={addNewNode} />
+        <p>Actions</p>
+        <div className="w-full bg-neutral-600 h-0.5 my-3"></div>
+        <TriggerButton name="Telegram" handleTriggerClick={addNewNode} />
+        <TriggerButton name="Email" handleTriggerClick={addNewNode} />
+      </div>
     </div>
   );
 }
