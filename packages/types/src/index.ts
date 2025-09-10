@@ -4,3 +4,10 @@ export interface TelegramNodeData {
     chatId: string 
     message: string
 }
+
+export interface WorkflowData {
+    id: string,
+    name: string,
+    enabled: boolean
+
+}
