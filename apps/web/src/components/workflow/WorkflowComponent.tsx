@@ -5,7 +5,6 @@ import {
   addEdge,
   Background,
   Connection,
-  Controls,
   Edge,
   Node,
   ReactFlow,
@@ -13,7 +12,7 @@ import {
   useNodesState,
 } from "@xyflow/react";
 import "@xyflow/react/dist/style.css";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import TelegramNode from "./nodes/ActionNode";
 import TriggerNode from "./nodes/TriggerNode";
 import TelegramAction from "../ui/TelegramAction";
