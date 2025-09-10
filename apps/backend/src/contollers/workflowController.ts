@@ -27,4 +27,12 @@ export class WorkflowController {
             }
         })
     }
+
+    async updateWorkflow(workflowId: string, workflowData: Partial<WorkflowData>) {
+        return await this.workflowRepo.updateOne(
+            { _id: new ObjectId(workflowId) },
+            { $set: workflowData }
+        );
+    }
+
 }

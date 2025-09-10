@@ -6,4 +6,10 @@ export class ConnectionEntity {
 
   @Column()
   target: string;
+
+  @Column()
+  sourceHandle: string;
+
+  @Column()
+  targetHandle: string;
 }

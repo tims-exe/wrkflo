@@ -51,7 +51,10 @@ export default function WorkflowComponent({
       );
 
       if (res.data.success) {
-        setWorkflow(res.data.workflow);
+        const wf = res.data.workflow
+        setWorkflow(wf);
+        setNodes(wf.nodes)
+        setEdges(wf.connections)
         setLoading(false)
       }
     };
@@ -85,12 +88,16 @@ export default function WorkflowComponent({
   }
 
   async function saveWorkflow() {
-    // const workflow = {
-    //   nodes: nodes,
-    //   edges: edges
-    // }
-    // const res = await axios.post(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/workflow/${workflowId}`, workflow)
-    // console.log('response : ', res.data)
+    const workflow = {
+      nodes: nodes,
+      connections: edges
+    }
+    const res = await axios.put(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/workflow/${workflowId}`, workflow, {
+      headers: {
+        Authorization: `${localStorage.getItem('token')}`
+      }
+    })
+    console.log('response : ', res.data)
   }
 
   if (loading) {

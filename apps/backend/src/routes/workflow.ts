@@ -2,6 +2,7 @@ import { Router } from "express";
 import { UserController } from "../contollers/userController";
 import { WorkflowController } from "../contollers/workflowController";
 import { WorkflowData } from "types";
+import { authMiddleware } from "./authMiddleware";
 
 
 export const workflowRouter: Router = Router()
@@ -113,7 +114,37 @@ workflowRouter.get('/:id', async (req, res) => {
 
 
 
-// // update workflow nodes and edges
-// workflowRouter.put('/:id', (req, res) => {
-    
-// })
+// update workflow nodes and edges
+workflowRouter.put('/:id', authMiddleware, async (req, res) => {
+    try {
+        const workflowId = req.params.id;
+        const { nodes, connections } = req.body;
+
+        if (!workflowId) {
+            return res.json({
+                success: false,
+                message:" no workflow id"
+            })
+        }
+
+        const result = await workflowController.updateWorkflow(workflowId, { nodes, connections });
+
+        if (!result) {
+            return res.json({
+                success: false,
+                message: "failed updating workflow"
+            });
+        }
+
+        return res.json({
+            success: true,
+            message: "updated workflow successfully"
+        });
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json({
+            success: false,
+            message: "error updating workflow"
+        });
+    }
+});
