@@ -1,3 +1,4 @@
+import { ObjectId } from "mongodb";
 import { AppDataSource } from "../config/data-source";
 import { User } from "../entities/User";
 
@@ -15,6 +16,12 @@ export class UserController {
     async findUser(email: string) {
         return await this.userRepo.findOne({
             where: { email }
+        })
+    }
+
+    async findByID(userId: string) {
+        return await this.userRepo.findOne({
+            where: { _id: new ObjectId(userId) }
         })
     }
 }

@@ -1,115 +1,131 @@
 import { Router } from "express";
 import { UserController } from "../contollers/userController";
-import jwt from 'jsonwebtoken'
+import jwt from "jsonwebtoken";
+import dotenv from "dotenv";
+import { authMiddleware } from "./authMiddleware";
 
-export const userRouter: Router = Router()
-const userController = new UserController()
+dotenv.config();
 
-userRouter.post('/signup', async (req, res) => {
-    console.log('POST: /api/v1/users/signup')
-    try {   
-        const { email, password } = req.body
+export const userRouter: Router = Router();
+const userController = new UserController();
 
-        if (!email || !password) {
-            return res.json({
-                success: false,
-                message: "provide credentials"
-            })
-        }
+const JWT_SECRET = process.env.JWT_SECRET!;
 
-        const existing = await userController.findUser(email)
-        if (existing) {
-            return res.json({
-                success: false,
-                message: "user exists"
-            })
-        }
+// Signup route
+userRouter.post("/signup", async (req, res) => {
+  console.log("POST: /api/v1/users/signup");
+  try {
+    const { email, password } = req.body;
 
-        const savedUser = await userController.createUser(email, password)
-
-        if (savedUser) {
-            return res.json({
-                success: true,
-                message: "signup successful"
-            })
-        }
-
-        return res.json({
-            success: false,
-            message: "signup failed"
-        })
-    } catch (error) {
-        console.log('signup error ' ,error)
-        return res.json({
-            success: false,
-            message: "error in signup"
-        })
+    if (!email || !password) {
+      return res.json({
+        success: false,
+        message: "provide credentials",
+      });
     }
-})
 
-userRouter.post('/signin', async (req, res) => {
-    console.log("POST /api/v1/users/signin")
-    try {
-        const { email, password } = req.body
-
-        if (!email || !password) {
-            return res.json({
-                success: false,
-                message: "provide credentials"
-            })
-        }
-
-        const user = await userController.findUser(email)
-        if (user) {
-            return res.json({
-                success: true,
-                message: "signin successful",
-                data: user.email
-            })
-        }
-        return res.json({
-            success: false,
-            message: "signin failed"
-        })
-    } catch (error) {
-        console.log('signin error : ', error)
-        return res.json({
-            success: false,
-            message: "error in signin"
-        })
+    const existing = await userController.findUser(email);
+    if (existing) {
+      return res.json({
+        success: false,
+        message: "user exists",
+      });
     }
-})
 
-userRouter.get('/verify', async (req, res) => {
-    console.log('GET /api/v1/users/verify')
-    try {
-        const { email } = req.body
+    const savedUser = await userController.createUser(email, password);
 
-        if (!email) {
-            return res.json({
-                success: false,
-                message: "provide credentials"
-            })
-        }
-        const user = await userController.findUser(email)
+    if (savedUser) {
+      const token = jwt.sign({ userId: savedUser._id.toString() }, JWT_SECRET);
 
-        if (user) {
-            return res.json({
-                success: true,
-                message: "user verified",
-                data: user.email
-            })
-        }
-
-        return res.json({
-            success: false,
-            message: "user not found",
-        })
-    } catch (error) {
-        console.log('verify error ',error)
-        return res.json({
-            success: false,
-            message: "error in verify"
-        })
+      return res.json({
+        success: true,
+        message: "signup successful",
+        token,
+      });
     }
-})
+
+    return res.json({
+      success: false,
+      message: "signup failed",
+    });
+  } catch (error) {
+    console.log("signup error ", error);
+    return res.json({
+      success: false,
+      message: "error in signup",
+    });
+  }
+});
+
+// Signin route
+userRouter.post("/signin", async (req, res) => {
+  console.log("POST /api/v1/users/signin");
+  try {
+    const { email, password } = req.body;
+
+    if (!email || !password) {
+      return res.json({
+        success: false,
+        message: "provide credentials",
+      });
+    }
+
+    const user = await userController.findUser(email);
+    if (user) {
+      // TODO: validate password properly with bcrypt
+      const token = jwt.sign({ userId: user._id.toString() }, JWT_SECRET);
+
+      return res.json({
+        success: true,
+        message: "signin successful",
+        token,
+      });
+    }
+    return res.json({
+      success: false,
+      message: "signin failed",
+    });
+  } catch (error) {
+    console.log("signin error : ", error);
+    return res.json({
+      success: false,
+      message: "error in signin",
+    });
+  }
+});
+
+// Verify route
+userRouter.get("/verify", authMiddleware, async (req, res) => {
+  console.log("GET /api/v1/users/verify");
+  try {
+    const userId = req.userId; // comes from authMiddleware
+
+    if (!userId) {
+      return res.json({
+        success: false,
+        message: "no userId found in token",
+      });
+    }
+
+    const user = await userController.findByID(userId);
+
+    if (user) {
+      return res.json({
+        success: true,
+        message: "user verified",
+        data: user.email,
+      });
+    }
+
+    return res.json({
+      success: false,
+      message: "user not found",
+    });
+  } catch (error) {
+    console.log("verify error ", error);
+    return res.json({
+      success: false,
+      message: "error in verify",
+    });
+  }
+});
