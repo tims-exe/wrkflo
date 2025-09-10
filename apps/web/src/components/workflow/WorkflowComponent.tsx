@@ -57,15 +57,20 @@ export default function WorkflowComponent() {
           <Background />
         </ReactFlow>
       </div>
-      <div className="w-[300px] bg-transparent border-2 rounded-2xl border-neutral-500 px-5 py-5">
-        <p>Triggers</p>
-        <div className="w-full bg-neutral-600 h-0.5 my-3"></div>
-        {/* <TriggerButton name="Manual" handleTriggerClick={addNewNode} /> */}
-        {/* <TriggerButton name="Webhook" handleTriggerClick={addNewNode} /> */}
-        <p>Actions</p>
-        <div className="w-full bg-neutral-600 h-0.5 my-3"></div>
-        <TelegramAction name="Telegram" handleNodeClick={addNewNode}/>
-        {/* <TriggerButton name="Email" handleTriggerClick={addNewNode} /> */}
+      <div className="w-[300px] flex flex-col gap-5">
+        <div className="w-full h-full bg-transparent border-2 rounded-2xl border-neutral-500 px-5 py-5">
+          <p>Triggers</p>
+          <div className="w-full bg-neutral-600 h-0.5 my-3"></div>
+          {/* <TriggerButton name="Manual" handleTriggerClick={addNewNode} /> */}
+          {/* <TriggerButton name="Webhook" handleTriggerClick={addNewNode} /> */}
+          <p>Actions</p>
+          <div className="w-full bg-neutral-600 h-0.5 my-3"></div>
+          <TelegramAction name="Telegram" handleNodeClick={addNewNode}/>
+          {/* <TriggerButton name="Email" handleTriggerClick={addNewNode} /> */}
+        </div>
+        <button className="border-2 rounded-2xl border-neutral-500 py-3 hover:cursor-pointer hover:bg-neutral-800 duration-200 transition-colors">
+          Save
+        </button>
       </div>
     </div>
   );
