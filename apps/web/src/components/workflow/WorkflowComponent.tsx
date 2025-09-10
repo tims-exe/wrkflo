@@ -5,6 +5,7 @@ import {
   addEdge,
   Background,
   Connection,
+  Controls,
   Edge,
   Node,
   ReactFlow,
@@ -12,22 +13,22 @@ import {
   useNodesState,
 } from "@xyflow/react";
 import "@xyflow/react/dist/style.css";
-import { useCallback, useEffect, useState } from "react";
-// import TriggerButton from "../ui/TriggerButton";
-import TelegramNode from "./nodes/TelegramNode";
+import { useCallback, useEffect, useRef, useState } from "react";
+import TelegramNode from "./nodes/ActionNode";
+import TriggerNode from "./nodes/TriggerNode";
 import TelegramAction from "../ui/TelegramAction";
-import { NodeData } from "@/types/nodes";
 import axios from "axios";
 import { WorkflowResponseData } from "@/types/workflow";
 
 const nodeTypes = {
   "telegram-action": TelegramNode,
+  "email-action": TelegramNode,
+  "manual-trigger": TriggerNode,
+  "webhook-trigger": TriggerNode,
 };
 
 const initialNodes: Node[] = [];
 const initialEdges: Edge[] = [];
-
-let nodeId = initialNodes.length + 1;
 
 export default function WorkflowComponent({
   workflowId,
@@ -56,7 +57,10 @@ export default function WorkflowComponent({
         setNodes(wf.nodes)
         setEdges(wf.connections)
         setLoading(false)
+        console.log(wf.nodes.length)
+
       }
+
     };
 
     fetchCurrentWorkflow();
@@ -66,20 +70,67 @@ export default function WorkflowComponent({
     setEdges((prevEdges) => addEdge(connection, prevEdges));
   }, []);
 
-  function addNewNode<T extends NodeData & Record<string, unknown>>(
-    nodeType: string,
-    data: T
-  ): void {
+  const onNodesDelete = useCallback((deletedNodes: Node[]) => {
+    console.log('deleted nodes:', deletedNodes);
+  }, []);
+
+  const onEdgesDelete = useCallback((deletedEdges: Edge[]) => {
+    console.log('deleted edges:', deletedEdges);
+  }, []);
+
+  function addManualTriggerNode(): void {
     const newNode: Node = {
-      id: `${nodeId++}`,
-      type: nodeType,
-      data: data,
-      position: { x: 300, y: 300 },
-      style: {
-        backgroundColor: "#525252",
-        color: "white",
-        borderRadius: "1rem",
+      id: `${nodes.length + 1}`,
+      type: "manual-trigger",
+      data: {
+        label: "Manual Trigger",
+        triggerType: "manual",
       },
+      position: { x: 50, y: 300 },
+    };
+
+    setNodes((prev) => [...prev, newNode]);
+  }
+
+  function addWebhookTriggerNode(): void {
+    const newNode: Node = {
+      id: `${nodes.length + 1}`,
+      type: "webhook-trigger",
+      data: {
+        label: "Webhook Trigger",
+        triggerType: "webhook",
+      },
+      position: { x: 50, y: 300 },
+    };
+
+    setNodes((prev) => [...prev, newNode]);
+  }
+
+  function addTelegramNode(): void {
+    const newNode: Node = {
+      id: `${nodes.length + 1}`,
+      type: "telegram-action",
+      data: {
+        label: "Telegram",
+        actionType: "telegram",
+      },
+      position: { x: 300, y: 300 },
+    };
+
+    setNodes((prev) => [...prev, newNode]);
+    console.log(nodes);
+    console.log(edges);
+  }
+
+  function addEmailNode(): void {
+    const newNode: Node = {
+      id: `${nodes.length + 1}`,
+      type: "email-action",
+      data: {
+        label: "Email",
+        actionType: "email",
+      },
+      position: { x: 300, y: 300 },
     };
 
     setNodes((prev) => [...prev, newNode]);
@@ -119,8 +170,13 @@ export default function WorkflowComponent({
             onNodesChange={onNodesChange}
             onEdgesChange={onEdgesChange}
             onConnect={onConnect}
+            onNodesDelete={onNodesDelete}
+            onEdgesDelete={onEdgesDelete}
             proOptions={{ hideAttribution: true }}
             nodeTypes={nodeTypes}
+            deleteKeyCode="Delete"
+            multiSelectionKeyCode="Shift"  
+            fitView
           >
             <Background />
           </ReactFlow>
@@ -129,12 +185,22 @@ export default function WorkflowComponent({
           <div className="w-full h-full bg-transparent border-2 rounded-2xl border-neutral-500 px-5 py-5">
             <p>Triggers</p>
             <div className="w-full bg-neutral-600 h-0.5 my-3"></div>
-            {/* <TriggerButton name="Manual" handleTriggerClick={addNewNode} /> */}
-            {/* <TriggerButton name="Webhook" handleTriggerClick={addNewNode} /> */}
+            <button
+              onClick={addManualTriggerNode}
+              className="bg-neutral-700 w-full px-4 py-4 rounded-2xl hover:cursor-pointer text-start mb-5"
+            >
+              Manual
+            </button>
+            <button
+              onClick={addWebhookTriggerNode}
+              className="bg-neutral-700 w-full px-4 py-4 rounded-2xl hover:cursor-pointer text-start mb-5"
+            >
+              Webhook
+            </button>
             <p>Actions</p>
             <div className="w-full bg-neutral-600 h-0.5 my-3"></div>
-            <TelegramAction name="Telegram" handleNodeClick={addNewNode} />
-            {/* <TriggerButton name="Email" handleTriggerClick={addNewNode} /> */}
+            <TelegramAction name="Telegram" handleNodeClick={addTelegramNode} />
+            <TelegramAction name="Email" handleNodeClick={addEmailNode} />
           </div>
           <button
             onClick={saveWorkflow}
