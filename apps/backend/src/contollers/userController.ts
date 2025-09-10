@@ -13,9 +13,9 @@ export class UserController {
         return await this.userRepo.save(newUser)
     }
 
-    async findUser(email: string) {
+    async findUser(email: string, password: string) {
         return await this.userRepo.findOne({
-            where: { email }
+            where: { email, password }
         })
     }
 

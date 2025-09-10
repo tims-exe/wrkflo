@@ -24,7 +24,7 @@ userRouter.post("/signup", async (req, res) => {
       });
     }
 
-    const existing = await userController.findUser(email);
+    const existing = await userController.findUser(email, password);
     if (existing) {
       return res.json({
         success: false,
@@ -70,7 +70,7 @@ userRouter.post("/signin", async (req, res) => {
       });
     }
 
-    const user = await userController.findUser(email);
+    const user = await userController.findUser(email, password);
     if (user) {
       // TODO: validate password properly with bcrypt
       const token = jwt.sign({ userId: user._id.toString() }, JWT_SECRET);

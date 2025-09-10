@@ -14,13 +14,15 @@ export default function AuthForm({ isSignUp, redirectText, redirectPath }: AuthF
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null); // ✅ added error state
   const router = useRouter();
 
   const handleSubmit = async () => {
     if (!email || !password) return;
-    
+
     setIsLoading(true);
-    
+    setError(null); 
+
     try {
       const endpoint = isSignUp ? "/signup" : "/signin";
       const response = await axios.post(
@@ -31,16 +33,14 @@ export default function AuthForm({ isSignUp, redirectText, redirectPath }: AuthF
       const data = response.data;
 
       if (data.success && data.token) {
-        if (isSignUp) {
-            router.push("/signin");
-        }
-        else {
-            localStorage.setItem("token", data.token);
-            router.push("/workflow");
-        }
+        localStorage.setItem("token", data.token);
+        router.push("/workflow");
+      } else {
+        setError("Authentication failed. Please try again.");
       }
-    } catch (error) {
-      console.error("Auth error:", error);
+    } catch (err) {
+      console.error("Auth error:", err);
+      setError("auth error");
     } finally {
       setIsLoading(false);
     }
@@ -91,6 +91,12 @@ export default function AuthForm({ isSignUp, redirectText, redirectPath }: AuthF
           >
             {isLoading ? "Loading..." : (isSignUp ? "Sign Up" : "Sign In")}
           </button>
+
+          {error && (
+            <div className="text-red-500 text-sm text-center mt-2">
+              {error}
+            </div>
+          )}
         </div>
       </div>
       
