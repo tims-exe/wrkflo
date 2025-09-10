@@ -98,7 +98,7 @@ userRouter.post("/signin", async (req, res) => {
 userRouter.get("/verify", authMiddleware, async (req, res) => {
   console.log("GET /api/v1/users/verify");
   try {
-    const userId = req.userId; // comes from authMiddleware
+    const userId = req.userId;
 
     if (!userId) {
       return res.json({
