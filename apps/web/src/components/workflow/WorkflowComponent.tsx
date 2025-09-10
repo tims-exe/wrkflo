@@ -8,6 +8,7 @@ import { useCallback } from "react";
 import TelegramNode from "./nodes/TelegramNode";
 import TelegramAction from "../ui/TelegramAction";
 import { NodeData } from "@/types/nodes";
+import axios from 'axios'
 
 const nodeTypes = {
   'telegram-action': TelegramNode
@@ -19,7 +20,7 @@ const initialEdges: Edge[] = []
 
 let nodeId = initialNodes.length + 1;
 
-export default function WorkflowComponent() {
+export default function WorkflowComponent({ workflowId } : { workflowId : string }) {
 
   const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes);
   const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges);
@@ -40,6 +41,14 @@ export default function WorkflowComponent() {
     setNodes((prev) => [...prev, newNode]);
     console.log(nodes)
     console.log(edges)
+  }
+
+  async function saveWorkflow() {
+    const workflow = {
+      nodes: nodes,
+      edges: edges
+    }
+    const res = await axios.post(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/workflow/${workflowId}`, workflow)
   }
 
   return (
@@ -68,7 +77,8 @@ export default function WorkflowComponent() {
           <TelegramAction name="Telegram" handleNodeClick={addNewNode}/>
           {/* <TriggerButton name="Email" handleTriggerClick={addNewNode} /> */}
         </div>
-        <button className="border-2 rounded-2xl border-neutral-500 py-3 hover:cursor-pointer hover:bg-neutral-800 duration-200 transition-colors">
+        <button onClick={saveWorkflow}
+        className="border-2 rounded-2xl border-neutral-500 py-3 hover:cursor-pointer hover:bg-neutral-800 duration-200 transition-colors">
           Save
         </button>
       </div>

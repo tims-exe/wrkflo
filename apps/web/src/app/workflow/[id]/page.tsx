@@ -8,7 +8,7 @@ export default async function Workflow({ params }: { params: { id: string } }) {
         <p className="mb-5">
             workflow {id}
         </p>
-        <WorkflowComponent />
+        <WorkflowComponent workflowId={id}/>
       {/* <div className="flex w-full gap-10">
         <WorkflowComponent />
         <div className="w-[300px] bg-transparent border-2 rounded-2xl border-neutral-500 px-5 py-5">

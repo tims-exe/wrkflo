@@ -2,6 +2,8 @@ import express from 'express'
 import cors from 'cors'
 import { AppDataSource } from './config/data-source.js'
 import { userRouter } from './routes/user.js'
+import { workflowRouter } from './routes/workflow.js'
+import { authMiddleware } from './routes/authMiddleware.js'
 
 const app = express()
 app.use(express.json())
@@ -17,6 +19,7 @@ app.use(cors())
 
 
 app.use('/api/v1/users', userRouter)
+app.use('/api/v1/workflow', authMiddleware, workflowRouter)
 
 
 AppDataSource.initialize()

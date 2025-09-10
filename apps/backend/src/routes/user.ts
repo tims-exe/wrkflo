@@ -1,5 +1,6 @@
 import { Router } from "express";
 import { UserController } from "../contollers/userController";
+import jwt from 'jsonwebtoken'
 
 export const userRouter: Router = Router()
 const userController = new UserController()
