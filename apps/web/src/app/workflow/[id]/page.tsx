@@ -5,9 +5,9 @@ export default async function Workflow({ params }: { params: { id: string } }) {
 
   return (
     <div className="px-10 py-10 flex flex-col">
-        <p className="mb-5">
+        {/* <p className="mb-5">
             workflow {id}
-        </p>
+        </p> */}
         <WorkflowComponent workflowId={id}/>
     </div>
   );
