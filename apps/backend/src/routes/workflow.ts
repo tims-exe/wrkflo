@@ -1,17 +1,17 @@
 import { Router } from "express";
-import { UserController } from "../contollers/userController";
-import { WorkflowController } from "../contollers/workflowController";
+import { UserModel } from "../models/userModel";
+import { WorkflowModel } from "../models/workflowModel";
 import { WorkflowData } from "types";
 import { authMiddleware } from "./authMiddleware";
 
 
 export const workflowRouter: Router = Router()
-const userController = new UserController()
-const workflowController = new WorkflowController()
+const userModel = new UserModel()
+const workflowModel = new WorkflowModel()
 
 workflowRouter.get('/', async (req, res) => {
     console.log('GET /api/v1/workflow/');
-    
+
     if (!req.userId) {
         return res.status(401).json({
             success: false,
@@ -20,7 +20,7 @@ workflowRouter.get('/', async (req, res) => {
     }
 
     try {
-        const workflows = await workflowController.getAllWorkflows(req.userId);
+        const workflows = await workflowModel.getAllWorkflows(req.userId);
 
         return res.json({
             success: true,
@@ -42,24 +42,24 @@ workflowRouter.post('/', async (req, res) => {
     if (!req.userId) return;
 
     const data = req.body
-    const user = await userController.findByID(req.userId)
+    const user = await userModel.findByID(req.userId)
 
     if (!user) {
-      return res.json({
-        success: false,
-        message: "no userId found in token",
-      });
+        return res.json({
+            success: false,
+            message: "no userId found in token",
+        });
     }
     const currentWorkflow: WorkflowData = {
         userId: user._id.toString(),
-        name: data.name, 
+        name: data.name,
         enabled: data.enabled,
         nodes: data.nodes,
         connections: data.connections,
         createdAt: data.createdAt,
         updatedAt: data.updatedAt
     }
-    const workflow = await workflowController.createWorkflow(currentWorkflow)
+    const workflow = await workflowModel.createWorkflow(currentWorkflow)
 
     if (workflow) {
         return res.json({
@@ -90,7 +90,7 @@ workflowRouter.get('/:id', async (req, res) => {
     const workflowId = req.params.id;
 
     try {
-        const workflow = await workflowController.getWorkflow(req.userId, workflowId);
+        const workflow = await workflowModel.getWorkflow(req.userId, workflowId);
 
         if (!workflow) {
             return res.status(404).json({
@@ -123,11 +123,11 @@ workflowRouter.put('/:id', authMiddleware, async (req, res) => {
         if (!workflowId) {
             return res.json({
                 success: false,
-                message:" no workflow id"
+                message: " no workflow id"
             })
         }
 
-        const result = await workflowController.updateWorkflow(workflowId, { nodes, connections });
+        const result = await workflowModel.updateWorkflow(workflowId, { nodes, connections });
 
         if (!result) {
             return res.json({
@@ -148,3 +148,46 @@ workflowRouter.put('/:id', authMiddleware, async (req, res) => {
         });
     }
 });
+
+
+
+workflowRouter.delete('/:id', authMiddleware, async (req, res) => {
+    try {
+        const workflowId = req.params.id 
+        const userId = req.userId;
+
+        if (!workflowId) {
+            return res.json({
+                success: false,
+                message: " no workflow id"
+            })
+        }
+        if (!userId) {
+            return res.json({
+                success: false,
+                message: " no user id"
+            })
+        }
+
+        const result = await workflowModel.deleteWorkflow(workflowId, userId)
+
+        if (result.deletedCount === 0) {
+        return res.json({
+                success: false,
+                message: "Failed deleting workflow"
+            });
+        }
+
+
+        return res.json({
+            success: true,
+            message: "delete workflow successfully"
+        });
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json({
+            success: false,
+            message: "error deleting workflow"
+        });
+    }
+})

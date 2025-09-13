@@ -3,7 +3,7 @@ import { AppDataSource } from "../config/data-source";
 import { Workflow } from "../entities/Workflow";
 import { WorkflowData } from "types";
 
-export class WorkflowController {
+export class WorkflowModel {
     private workflowRepo = AppDataSource.getMongoRepository(Workflow);
 
     async createWorkflow(workflowData: WorkflowData) {
@@ -35,4 +35,10 @@ export class WorkflowController {
         );
     }
 
+    async deleteWorkflow(workflowId: string, userId: string) {
+        return await this.workflowRepo.deleteOne({
+            _id: new ObjectId(workflowId),
+            userId
+        });
+    }
 }

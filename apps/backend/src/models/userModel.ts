@@ -2,7 +2,7 @@ import { ObjectId } from "mongodb";
 import { AppDataSource } from "../config/data-source";
 import { User } from "../entities/User";
 
-export class UserController {
+export class UserModel {
     private userRepo = AppDataSource.getMongoRepository(User)
 
     async createUser(email: string, password: string) {

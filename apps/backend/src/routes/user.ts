@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { UserController } from "../contollers/userController";
+import { UserModel } from "../models/userModel";
 import jwt from "jsonwebtoken";
 import dotenv from "dotenv";
 import { authMiddleware } from "./authMiddleware";
@@ -7,7 +7,7 @@ import { authMiddleware } from "./authMiddleware";
 dotenv.config();
 
 export const userRouter: Router = Router();
-const userController = new UserController();
+const userModel = new UserModel();
 
 const JWT_SECRET = process.env.JWT_SECRET!;
 
@@ -24,7 +24,7 @@ userRouter.post("/signup", async (req, res) => {
       });
     }
 
-    const existing = await userController.findUser(email, password);
+    const existing = await userModel.findUser(email, password);
     if (existing) {
       return res.json({
         success: false,
@@ -32,7 +32,7 @@ userRouter.post("/signup", async (req, res) => {
       });
     }
 
-    const savedUser = await userController.createUser(email, password);
+    const savedUser = await userModel.createUser(email, password);
 
     if (savedUser) {
       const token = jwt.sign({ userId: savedUser._id.toString() }, JWT_SECRET);
@@ -70,7 +70,7 @@ userRouter.post("/signin", async (req, res) => {
       });
     }
 
-    const user = await userController.findUser(email, password);
+    const user = await userModel.findUser(email, password);
     if (user) {
       // TODO: validate password properly with bcrypt
       const token = jwt.sign({ userId: user._id.toString() }, JWT_SECRET);
@@ -107,7 +107,7 @@ userRouter.get("/verify", authMiddleware, async (req, res) => {
       });
     }
 
-    const user = await userController.findByID(userId);
+    const user = await userModel.findByID(userId);
 
     if (user) {
       return res.json({

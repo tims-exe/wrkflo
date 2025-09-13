@@ -9,13 +9,13 @@ const app = express()
 app.use(express.json())
 app.use(cors())
 
-// app.get('/', (req, res) => {
-//     console.log("GET: /")
-//     return res.json({
-//         success: true,
-//         message: "server running"
-//     })
-// })
+app.get('/', (req, res) => {
+    console.log("GET: /")
+    return res.json({
+        success: true,
+        message: "server running"
+    })
+})
 
 
 app.use('/api/v1/users', userRouter)

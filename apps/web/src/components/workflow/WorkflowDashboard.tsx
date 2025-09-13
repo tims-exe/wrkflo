@@ -33,6 +33,21 @@ export default function WorkflowDashboard() {
         fetchWorkflows()
     }, [])
 
+  async function handleDeleteWorkflow(id: string) {
+    const res = await axios.delete(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/workflow/${id}`, {
+      headers: {
+        Authorization: `${localStorage.getItem('token')}`
+      }
+    })
+
+    if (res.data.success === false) {
+      console.log('failed deltion', res.data.message)
+      return 
+    }
+
+    setCurrentWorkflows((prev) => prev?.filter((w) => w._id !== id))
+  }
+
   return (
     <Table>
       {/* <TableCaption>A list of your recent invoices.</TableCaption> */}
@@ -55,8 +70,10 @@ export default function WorkflowDashboard() {
                         O
                     </button>
                 </TableCell>
-                <TableCell className="text-right">
-                    <button>
+                <TableCell  
+                className="text-right">
+                    <button onClick={() => handleDeleteWorkflow(w._id)}
+                      className="hover:cursor-pointer">
                         X
                     </button>
                 </TableCell>

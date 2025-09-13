@@ -56,11 +56,11 @@ export default function NewWorkflowButton() {
         <div>
           <p className="text-md text-neutral-400 mt-5">Name</p>
           <input 
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            type="text" 
-            className="bg-transparent border-2 border-neutral-600 w-full rounded-[5px] px-3 py-2" 
-          />
+          value={name}
+          onChange={(e) => setName(e.target.value.replace(/\s/g, ""))}
+          type="text" 
+          className="bg-transparent border-2 border-neutral-600 w-full rounded-[5px] px-3 py-2" 
+        />
         </div>
         <DialogFooter className="sm:justify-end">
           <DialogClose asChild>
