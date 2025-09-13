@@ -25,6 +25,17 @@ export interface AiNodeData extends Record<string, unknown> {
   actionType: 'agent-action'
 }
 
+export interface ModelNodeData extends Record<string, unknown> {
+  label: string,
+  apiKey: string,
+  model: string,
+}
+
+export interface ToolNodeData extends Record<string, unknown>{
+  label: string,
+  type: string
+}
+
 export interface WorkflowData {
     userId: string
     name: string;

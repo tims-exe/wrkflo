@@ -19,21 +19,35 @@ import TelegramAction from "./actions/TelegramAction";
 import axios from "axios";
 import { WorkflowResponseData } from "@/types/workflow";
 import EmailAction from "./actions/EmailAction";
-import { AiNodeData, EmailNodeData, TelegramNodeData, WebhookNodeData } from "types";
+import {
+  AiNodeData,
+  EmailNodeData,
+  ModelNodeData,
+  TelegramNodeData,
+  ToolNodeData,
+  WebhookNodeData,
+} from "types";
 import WebhookAction from "./actions/WebhookAction";
 import AiAction from "./actions/AiAction";
 import AiNode from "./nodes/AiNode";
+import ModelAction from "./actions/ModelAction";
+import GetToolAction from "./actions/GetToolAction";
+import AgentToolNode from "./nodes/AgentToolNode";
 
 const nodeTypes = {
   "telegram-action": TelegramNode,
   "email-action": TelegramNode,
   "manual-trigger": TriggerNode,
   "webhook-trigger": TriggerNode,
-  "agent-action": AiNode
+  "agent-action": AiNode,
+  "model-tool": AgentToolNode,
+  "get-tool": AgentToolNode,
 };
 
 const initialNodes: Node[] = [];
 const initialEdges: Edge[] = [];
+
+type SidebarView = "main" | "triggers" | "actions" | "tools";
 
 export default function WorkflowComponent({
   workflowId,
@@ -44,6 +58,7 @@ export default function WorkflowComponent({
   const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges);
   const [worflow, setWorkflow] = useState<WorkflowResponseData>();
   const [loading, setLoading] = useState(true);
+  const [sidebarView, setSidebarView] = useState<SidebarView>("main");
 
   useEffect(() => {
     const fetchCurrentWorkflow = async () => {
@@ -106,7 +121,6 @@ export default function WorkflowComponent({
     setNodes((prev) => [...prev, newNode]);
   }
 
-
   function addTelegramNode(nodeData: TelegramNodeData) {
     const newNode: Node = {
       id: `${nodes.length + 1}`,
@@ -130,16 +144,45 @@ export default function WorkflowComponent({
   }
 
   function addAgentNode(nodeData: AiNodeData) {
-    const newNode: Node ={
+    const newNode: Node = {
       id: `${nodes.length + 1}`,
-      type: 'agent-action',
+      type: "agent-action",
       data: nodeData,
       position: {
-        x: 300, y: 300
-      }
-    }
+        x: 300,
+        y: 300,
+      },
+    };
 
-    setNodes((prev) => [...prev, newNode])
+    setNodes((prev) => [...prev, newNode]);
+  }
+
+  function addModelNode(nodeData: ModelNodeData) {
+    const newNode: Node = {
+      id: `${nodes.length + 1}`,
+      type: "model-tool",
+      data: nodeData,
+      position: {
+        x: 300,
+        y: 300,
+      },
+    };
+
+    setNodes((prev) => [...prev, newNode]);
+  }
+
+  function addGetTool(nodeData: ToolNodeData) {
+    const newNode: Node = {
+      id: `${nodes.length + 1}`,
+      type: "get-tool",
+      data: nodeData,
+      position: {
+        x: 300,
+        y: 300,
+      },
+    };
+
+    setNodes((prev) => [...prev, newNode]);
   }
 
   async function saveWorkflow() {
@@ -158,6 +201,101 @@ export default function WorkflowComponent({
     );
     console.log("response : ", res.data);
   }
+
+  const renderSidebarContent = () => {
+    switch (sidebarView) {
+      case "main":
+        return (
+          <div className="space-y-4">
+            <h3 className="text-lg font-medium mb-4 text-center">Nodes</h3>
+            <button
+              onClick={() => setSidebarView("triggers")}
+              className="bg-neutral-700 w-full px-4 py-4 rounded-2xl hover:bg-neutral-600 transition-colors text-start"
+            >
+              Triggers
+            </button>
+            <button
+              onClick={() => setSidebarView("actions")}
+              className="bg-neutral-700 w-full px-4 py-4 rounded-2xl hover:bg-neutral-600 transition-colors text-start"
+            >
+              Actions
+            </button>
+            <button
+              onClick={() => setSidebarView("tools")}
+              className="bg-neutral-700 w-full px-4 py-4 rounded-2xl hover:bg-neutral-600 transition-colors text-start"
+            >
+              Tools
+            </button>
+          </div>
+        );
+
+      case "triggers":
+        return (
+          <div className="space-y-4">
+            <div className="flex items-center justify-between mb-4">
+              <button
+                onClick={() => setSidebarView("main")}
+                className="p-2 hover:bg-neutral-700 rounded-lg transition-colors"
+              >
+                ✕
+              </button>
+              <h3 className="text-lg font-medium">Triggers</h3>
+              <div className="w-10"></div> {/* Spacer for centering */}
+            </div>
+            <button
+              onClick={addManualTriggerNode}
+              className="bg-neutral-700 w-full px-4 py-4 rounded-2xl hover:bg-neutral-600 transition-colors text-start"
+            >
+              Manual
+            </button>
+            <WebhookAction
+              name="Webhook"
+              handleNodeClick={addWebhookTriggerNode}
+            />
+          </div>
+        );
+
+      case "actions":
+        return (
+          <div className="space-y-4">
+            <div className="flex items-center justify-between mb-4">
+              <button
+                onClick={() => setSidebarView("main")}
+                className="p-2 hover:bg-neutral-700 rounded-lg transition-colors"
+              >
+                ✕
+              </button>
+              <h3 className="text-lg font-medium">Actions</h3>
+              <div className="w-10"></div> {/* Spacer for centering */}
+            </div>
+            <TelegramAction name="Telegram" handleNodeClick={addTelegramNode} />
+            <EmailAction name="Email" handleNodeClick={addEmailNode} />
+            <AiAction name="Agent" handleNodeClick={addAgentNode} />
+          </div>
+        );
+
+      case "tools":
+        return (
+          <div className="space-y-4">
+            <div className="flex items-center justify-between mb-4">
+              <button
+                onClick={() => setSidebarView("main")}
+                className="p-2 hover:bg-neutral-700 rounded-lg transition-colors"
+              >
+                ✕
+              </button>
+              <h3 className="text-lg font-medium">Tools</h3>
+              <div className="w-10"></div> {/* Spacer for centering */}
+            </div>
+            <ModelAction name="Model" handleNodeClick={addModelNode} />
+            <GetToolAction name="Tool" handleNodeClick={addGetTool} />
+          </div>
+        );
+
+      default:
+        return null;
+    }
+  };
 
   if (loading) {
     return (
@@ -189,32 +327,16 @@ export default function WorkflowComponent({
             <Background />
           </ReactFlow>
         </div>
-        <div className="w-[300px] flex flex-col gap-5">
-          <div className="w-full h-full bg-transparent border-2 rounded-2xl border-neutral-500 px-5 py-5">
-            <p>Triggers</p>
-            <div className="w-full bg-neutral-600 h-0.5 my-3"></div>
-            <button
-              onClick={addManualTriggerNode}
-              className="bg-neutral-700 w-full px-4 py-4 rounded-2xl hover:cursor-pointer text-start mb-5"
-            >
-              Manual
-            </button>
-            {/* <button
-              onClick={addWebhookTriggerNode}
-              className="bg-neutral-700 w-full px-4 py-4 rounded-2xl hover:cursor-pointer text-start mb-5"
-            >
-              Webhook
-            </button> */}
-            <WebhookAction name="Webhook" handleNodeClick={addWebhookTriggerNode} />
-            <p>Actions</p>
-            <div className="w-full bg-neutral-600 h-0.5 my-3"></div>
-            <TelegramAction name="Telegram" handleNodeClick={addTelegramNode} />
-            <EmailAction name="Email" handleNodeClick={addEmailNode} />
-            <AiAction name="Agent" handleNodeClick={addAgentNode} />
+
+        {/* Fixed Sidebar */}
+        <div className="w-[300px] flex flex-col gap-5 h-[600px]">
+          <div className="flex-1 bg-transparent border-2 rounded-2xl border-neutral-500 px-5 py-5 overflow-hidden">
+            {renderSidebarContent()}
           </div>
+
           <button
             onClick={saveWorkflow}
-            className="border-2 rounded-2xl border-neutral-500 py-3 hover:cursor-pointer hover:bg-neutral-800 duration-200 transition-colors"
+            className="h-1/9 border-2 rounded-2xl border-neutral-500 py-3 hover:cursor-pointer hover:bg-neutral-800 duration-200 transition-colors"
           >
             Save
           </button>
