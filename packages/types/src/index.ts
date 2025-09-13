@@ -68,6 +68,7 @@ export interface ConnectionData {
 
 export interface CredentialTypes {
     userId: string
+    name: string
     app: string
     key: string
 }

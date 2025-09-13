@@ -23,6 +23,7 @@ import { useCredentialStore } from "@/state/credentialsState";
 export default function NewCredentialsButton() {
   const [key, setKey] = useState("");
   const [app, setApp] = useState("");
+  const [name, setName] = useState("")
   const dialogCloseRef = useRef<HTMLButtonElement>(null);
   const addCredential = useCredentialStore(state => state.addCredentials);
 
@@ -36,7 +37,7 @@ export default function NewCredentialsButton() {
       const token = localStorage.getItem("token");
       const res = await axios.post(
         `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/credentials/new`,
-        { app, key },
+        { app, name, key },
         {
           headers: {
             Authorization: `${token}`,
@@ -81,6 +82,13 @@ export default function NewCredentialsButton() {
               </SelectItem>
             </SelectContent>
           </Select>
+          <p className="text-md text-neutral-400 mt-5">Name</p>
+          <input
+            value={name}
+            onChange={(e) => setName(e.target.value.replace(/\s/g, ""))}
+            type="text"
+            className="bg-transparent border-2 border-neutral-600 w-full rounded-[5px] px-3 py-2"
+          />
           <p className="text-md text-neutral-400 mt-5">Key</p>
           <input
             value={key}

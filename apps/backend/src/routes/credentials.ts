@@ -10,14 +10,14 @@ credRouter.post("/new", async (req, res) => {
         const userId = req.userId;
         if (!userId) return
 
-        const { app, key } = req.body;
-        if (!app || !key) {
+        const { app, key, name } = req.body;
+        if (!app || !key || !name) {
             return res.json({
                 success: false,
-                message: "App and key are required"
+                message: "credentials required"
             });
         }
-        const newCred = await credentialModel.createCred({ userId, app, key });
+        const newCred = await credentialModel.createCred({ userId, app, key, name });
 
         return res.json({
             success: true,

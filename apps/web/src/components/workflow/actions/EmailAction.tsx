@@ -12,6 +12,8 @@ import {
 import { NodeData } from "@/types/nodes";
 import { useState } from "react";
 import { EmailNodeData } from "types";
+import CredentialsSelector from "@/components/ui/CredentialsSelector";
+
 
 interface ActionComponentProps<T extends NodeData & Record<string, unknown>> {
   name: string;
@@ -56,12 +58,11 @@ export default function EmailAction({
           <DialogTitle>{existingData ? "Edit Email Action" : "Send an Email"}</DialogTitle>
         </DialogHeader>
         <div>
-          <p className="text-md text-neutral-400 mt-5">Credentials</p>
-          <input
+          <CredentialsSelector
             value={creds}
-            onChange={(e) => setCreds(e.target.value)}
-            type="text"
-            className="bg-transparent border-2 border-neutral-600 w-full rounded-[5px] px-3 py-2"
+            onValueChange={setCreds}
+            placeholder="Select email credentials"
+            app="email"
           />
 
           <p className="text-md text-neutral-400 mt-5">Email body</p>
@@ -77,7 +78,7 @@ export default function EmailAction({
           <DialogClose asChild>
             <button
               onClick={handleSave}
-              className="bg-neutral-700 px-3 py-2 rounded-[10px] hover:cursor-pointer"
+              className="bg-neutral-700 px-3 py-2 rounded-[5px] hover:cursor-pointer"
             >
               Save
             </button>

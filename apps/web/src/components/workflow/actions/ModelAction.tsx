@@ -11,6 +11,7 @@ import {
 } from "@/components/ui/dialog";
 import { useState } from "react";
 import { ModelNodeData } from "types";
+import CredentialsSelector from "@/components/ui/CredentialsSelector";
 
 interface ModelActionProps {
   name: string;
@@ -18,13 +19,13 @@ interface ModelActionProps {
   children?: React.ReactNode;
   existingData?: ModelNodeData
 }
+
 export default function ModelAction({
   name,
   handleNodeClick,
   children,
   existingData,
 }: ModelActionProps) {
-//   const [systemPrompt, setSystemPrompt] = useState<string>(existingData?.systemPrompt || "");
   const [api, setApi] = useState<string>(existingData?.apiKey || "")
   const [model, setModel] = useState(existingData?.model || "")
 
@@ -37,11 +38,12 @@ export default function ModelAction({
 
     handleNodeClick(nodeData);
   };
+
   return (
     <Dialog>
       <DialogTrigger asChild>
         {children ? (
-          children
+          children 
         ) : (
           <button className="bg-neutral-700 w-full px-4 py-4 rounded-2xl hover:cursor-pointer text-start mb-5">
             {name}
@@ -54,10 +56,18 @@ export default function ModelAction({
           <DialogTitle>Setup Model Parameters</DialogTitle>
         </DialogHeader>
         <div>
-          <p className="text-md text-neutral-400 mt-5">Api Key</p>
-          <input
+          <CredentialsSelector
             value={api}
-            onChange={(e) => setApi(e.target.value)}
+            onValueChange={setApi}
+            placeholder="Select API key credentials"
+            label="API Key"
+            app="openai"
+          />
+          
+          <p className="text-md text-neutral-400 mt-5">Model</p>
+          <input
+            value={model}
+            onChange={(e) => setModel(e.target.value)}
             type="text"
             className="bg-transparent border-2 border-neutral-600 w-full rounded-[5px] px-3 py-2"
           />

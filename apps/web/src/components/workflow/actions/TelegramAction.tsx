@@ -12,6 +12,7 @@ import {
 import { NodeData } from "@/types/nodes";
 import { useState } from "react";
 import { TelegramNodeData } from "types";
+import CredentialsSelector from "@/components/ui/CredentialsSelector";
 
 interface ActionComponentProps<T extends NodeData & Record<string, unknown>> {
   name: string;
@@ -30,8 +31,7 @@ export default function TelegramAction({
   const [chatId, setChatId] = useState<string>(existingData?.chatId || "");
   const [text, setText] = useState<string>(existingData?.message || "");
 
-  console.log('exising data : ', existingData)
-
+  console.log('existing data : ', existingData)
 
   const handleSave = () => {
       const nodeData: TelegramNodeData = {
@@ -43,7 +43,6 @@ export default function TelegramAction({
       }
       handleNodeClick(nodeData);
     };
-  
 
   return (
     <Dialog>
@@ -65,12 +64,11 @@ export default function TelegramAction({
         </DialogHeader>
 
         <div>
-          <p className="text-md text-neutral-400 mt-5">Credentials</p>
-          <input
+          <CredentialsSelector
             value={creds}
-            onChange={(e) => setCreds(e.target.value)}
-            type="text"
-            className="bg-transparent border-2 border-neutral-600 w-full rounded-[5px] px-3 py-2"
+            onValueChange={setCreds}
+            placeholder="Select Telegram credentials"
+            app="telegram"
           />
 
           <p className="text-md text-neutral-400 mt-5">Chat ID</p>

@@ -96,9 +96,20 @@ export default function WorkflowComponent({
     console.log("deleted edges:", deletedEdges);
   }, []);
 
+  const getNextNodeId = (nodes: Node[]) => {
+    const existingIds = nodes
+      .map((node) => parseInt(node.id))
+      .filter((id) => !isNaN(id));
+    let nextId = 1;
+    while (existingIds.includes(nextId)) {
+      nextId++;
+    }
+    return nextId.toString();
+  };
+
   function addManualTriggerNode(): void {
     const newNode: Node = {
-      id: `${nodes.length + 1}`,
+      id: getNextNodeId(nodes),
       type: "manual-trigger",
       data: {
         label: "Manual Trigger",
@@ -112,7 +123,7 @@ export default function WorkflowComponent({
 
   function addWebhookTriggerNode(nodeData: WebhookNodeData) {
     const newNode: Node = {
-      id: `${nodes.length + 1}`,
+      id: getNextNodeId(nodes),
       type: "webhook-trigger",
       data: nodeData,
       position: { x: 50, y: 300 },
@@ -123,7 +134,7 @@ export default function WorkflowComponent({
 
   function addTelegramNode(nodeData: TelegramNodeData) {
     const newNode: Node = {
-      id: `${nodes.length + 1}`,
+      id: getNextNodeId(nodes),
       type: "telegram-action",
       data: nodeData,
       position: { x: 300, y: 300 },
@@ -134,7 +145,7 @@ export default function WorkflowComponent({
 
   function addEmailNode(nodeData: EmailNodeData) {
     const newNode: Node = {
-      id: `${nodes.length + 1}`,
+      id: getNextNodeId(nodes),
       type: "email-action",
       data: nodeData,
       position: { x: 300, y: 300 },
@@ -145,7 +156,7 @@ export default function WorkflowComponent({
 
   function addAgentNode(nodeData: AiNodeData) {
     const newNode: Node = {
-      id: `${nodes.length + 1}`,
+      id: getNextNodeId(nodes),
       type: "agent-action",
       data: nodeData,
       position: {
@@ -159,7 +170,7 @@ export default function WorkflowComponent({
 
   function addModelNode(nodeData: ModelNodeData) {
     const newNode: Node = {
-      id: `${nodes.length + 1}`,
+      id: getNextNodeId(nodes),
       type: "model-tool",
       data: nodeData,
       position: {
@@ -173,7 +184,7 @@ export default function WorkflowComponent({
 
   function addGetTool(nodeData: ToolNodeData) {
     const newNode: Node = {
-      id: `${nodes.length + 1}`,
+      id: getNextNodeId(nodes),
       type: "get-tool",
       data: nodeData,
       position: {

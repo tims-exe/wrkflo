@@ -12,5 +12,8 @@ export class Credential {
     app: string;
 
     @Column()
+    name: string;
+
+    @Column()
     key: string
 }

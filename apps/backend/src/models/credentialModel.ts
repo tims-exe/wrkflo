@@ -9,6 +9,7 @@ export class CredentialModel {
     async createCred(data: CredentialTypes) {
         const newCred = this.credRepo.create({
             userId: data.userId,
+            name: data.name,
             app: data.app,
             key: data.key
         });
