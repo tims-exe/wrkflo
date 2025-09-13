@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 "use client";
 
 import {
@@ -10,34 +9,32 @@ import {
   DialogFooter,
   DialogClose,
 } from "@/components/ui/dialog";
-import { NodeData } from "@/types/nodes";
 import { useState } from "react";
-import { WebhookNodeData } from "types";
+import { AiNodeData } from "types";
 
-interface WebhookActionProps<T extends NodeData & Record<string, unknown>> {
+interface AiActionProps {
   name: string;
-  handleNodeClick: (nodeData: WebhookNodeData) => void;
+  handleNodeClick: (nodeData: AiNodeData) => void;
   children?: React.ReactNode;
-  existingData?: WebhookNodeData;
+  existingData?: AiNodeData
 }
-
-export default function WebhookAction({
+export default function AiAction({
   name,
   handleNodeClick,
   children,
   existingData,
-}: WebhookActionProps<WebhookNodeData & Record<string, unknown>>) {
-  const [url, setUrl] = useState<string>(existingData?.url || "");
+}: AiActionProps) {
+  const [systemPrompt, setSystemPrompt] = useState<string>(existingData?.systemPrompt || "");
 
   const handleSave = () => {
-    const nodeData: WebhookNodeData = {
-      label: "Webhook",
-      triggerType: "webhook",
-      url: url,
+    const nodeData: AiNodeData = {
+      label: "Agent",
+      systemPrompt: systemPrompt,
+      actionType: "agent-action",
     };
+
     handleNodeClick(nodeData);
   };
-
   return (
     <Dialog>
       <DialogTrigger asChild>
@@ -50,18 +47,15 @@ export default function WebhookAction({
         )}
       </DialogTrigger>
 
-      <DialogContent className="border-2 border-neutral-700 rounded-2xl">
+      <DialogContent>
         <DialogHeader>
-          <DialogTitle>
-            {existingData ? "Edit Webhook Trigger" : "Setup Webhook Trigger"}
-          </DialogTitle>
+          <DialogTitle>Setup Ai Agent</DialogTitle>
         </DialogHeader>
-
         <div>
-          <p className="text-md text-neutral-400 mt-5">Webhook URL</p>
+          <p className="text-md text-neutral-400 mt-5">System Prompt</p>
           <input
-            value={url}
-            onChange={(e) => setUrl(e.target.value)}
+            value={systemPrompt}
+            onChange={(e) => setSystemPrompt(e.target.value)}
             type="text"
             className="bg-transparent border-2 border-neutral-600 w-full rounded-[5px] px-3 py-2"
           />

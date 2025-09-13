@@ -19,6 +19,12 @@ export interface WebhookNodeData extends Record<string, unknown> {
   url: string
 }
 
+export interface AiNodeData extends Record<string, unknown> {
+  label: string,
+  systemPrompt: string,
+  actionType: 'agent-action'
+}
+
 export interface WorkflowData {
     userId: string
     name: string;

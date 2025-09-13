@@ -19,14 +19,17 @@ import TelegramAction from "./actions/TelegramAction";
 import axios from "axios";
 import { WorkflowResponseData } from "@/types/workflow";
 import EmailAction from "./actions/EmailAction";
-import { EmailNodeData, TelegramNodeData, WebhookNodeData } from "types";
+import { AiNodeData, EmailNodeData, TelegramNodeData, WebhookNodeData } from "types";
 import WebhookAction from "./actions/WebhookAction";
+import AiAction from "./actions/AiAction";
+import AiNode from "./nodes/AiNode";
 
 const nodeTypes = {
   "telegram-action": TelegramNode,
   "email-action": TelegramNode,
   "manual-trigger": TriggerNode,
   "webhook-trigger": TriggerNode,
+  "agent-action": AiNode
 };
 
 const initialNodes: Node[] = [];
@@ -113,8 +116,6 @@ export default function WorkflowComponent({
     };
 
     setNodes((prev) => [...prev, newNode]);
-    console.log(nodes);
-    console.log(edges);
   }
 
   function addEmailNode(nodeData: EmailNodeData) {
@@ -126,8 +127,19 @@ export default function WorkflowComponent({
     };
 
     setNodes((prev) => [...prev, newNode]);
-    console.log(nodes);
-    console.log(edges);
+  }
+
+  function addAgentNode(nodeData: AiNodeData) {
+    const newNode: Node ={
+      id: `${nodes.length + 1}`,
+      type: 'agent-action',
+      data: nodeData,
+      position: {
+        x: 300, y: 300
+      }
+    }
+
+    setNodes((prev) => [...prev, newNode])
   }
 
   async function saveWorkflow() {
@@ -198,6 +210,7 @@ export default function WorkflowComponent({
             <div className="w-full bg-neutral-600 h-0.5 my-3"></div>
             <TelegramAction name="Telegram" handleNodeClick={addTelegramNode} />
             <EmailAction name="Email" handleNodeClick={addEmailNode} />
+            <AiAction name="Agent" handleNodeClick={addAgentNode} />
           </div>
           <button
             onClick={saveWorkflow}
