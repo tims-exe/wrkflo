@@ -1,6 +1,11 @@
+// types/nodes.ts
 import { Node } from "@xyflow/react";
-import { TelegramNodeData } from "types";
+import { EmailNodeData, TelegramNodeData, WebhookNodeData } from "types";
 
-export type TelegramNodeType = Node<TelegramNodeData & Record<string, unknown>, 'telegram-action'>;
+export type NodeData = TelegramNodeData | EmailNodeData | WebhookNodeData;
 
-export type NodeData = TelegramNodeData //| EmailNodeData | ManualTriggerData | WebhookTriggerData;
+export type TelegramNodeType = Node<TelegramNodeData, "telegram-action">;
+export type EmailNodeType = Node<EmailNodeData, "email-action">;
+export type WebhookNodeType = Node<WebhookNodeData, "webhook-trigger">;
+export type ActionNodeType = Node<NodeData, "telegram-action" | "email-action">;
+export type TriggerNodeType = Node<NodeData, "webhook-trigger">;

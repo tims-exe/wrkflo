@@ -1,8 +1,22 @@
-export interface TelegramNodeData {
-    label: string
-    credentials: string
-    chatId: string
-    message: string
+export interface TelegramNodeData extends Record<string, unknown> {
+  label: string;
+  credentials: string;
+  chatId: string;
+  message: string;
+  actionType?: "telegram";
+}
+
+export interface EmailNodeData extends Record<string, unknown> {
+  label: string;
+  credentials: string;
+  body: string;
+  actionType?: "email";
+}
+
+export interface WebhookNodeData extends Record<string, unknown> {
+  label: "Webhook",
+  triggerType: "webhook",
+  url: string
 }
 
 export interface WorkflowData {

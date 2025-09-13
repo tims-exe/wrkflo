@@ -15,9 +15,12 @@ import "@xyflow/react/dist/style.css";
 import { useCallback, useEffect, useState } from "react";
 import TelegramNode from "./nodes/ActionNode";
 import TriggerNode from "./nodes/TriggerNode";
-import TelegramAction from "../ui/TelegramAction";
+import TelegramAction from "./actions/TelegramAction";
 import axios from "axios";
 import { WorkflowResponseData } from "@/types/workflow";
+import EmailAction from "./actions/EmailAction";
+import { EmailNodeData, TelegramNodeData, WebhookNodeData } from "types";
+import WebhookAction from "./actions/WebhookAction";
 
 const nodeTypes = {
   "telegram-action": TelegramNode,
@@ -37,7 +40,7 @@ export default function WorkflowComponent({
   const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes);
   const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges);
   const [worflow, setWorkflow] = useState<WorkflowResponseData>();
-  const [loading, setLoading] = useState(true)
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchCurrentWorkflow = async () => {
@@ -51,15 +54,13 @@ export default function WorkflowComponent({
       );
 
       if (res.data.success) {
-        const wf = res.data.workflow
+        const wf = res.data.workflow;
         setWorkflow(wf);
-        setNodes(wf.nodes)
-        setEdges(wf.connections)
-        setLoading(false)
-        console.log(wf.nodes.length)
-
+        setNodes(wf.nodes);
+        setEdges(wf.connections);
+        setLoading(false);
+        console.log(wf.nodes.length);
       }
-
     };
 
     fetchCurrentWorkflow();
@@ -70,11 +71,11 @@ export default function WorkflowComponent({
   }, []);
 
   const onNodesDelete = useCallback((deletedNodes: Node[]) => {
-    console.log('deleted nodes:', deletedNodes);
+    console.log("deleted nodes:", deletedNodes);
   }, []);
 
   const onEdgesDelete = useCallback((deletedEdges: Edge[]) => {
-    console.log('deleted edges:', deletedEdges);
+    console.log("deleted edges:", deletedEdges);
   }, []);
 
   function addManualTriggerNode(): void {
@@ -91,28 +92,23 @@ export default function WorkflowComponent({
     setNodes((prev) => [...prev, newNode]);
   }
 
-  function addWebhookTriggerNode(): void {
+  function addWebhookTriggerNode(nodeData: WebhookNodeData) {
     const newNode: Node = {
       id: `${nodes.length + 1}`,
       type: "webhook-trigger",
-      data: {
-        label: "Webhook Trigger",
-        triggerType: "webhook",
-      },
+      data: nodeData,
       position: { x: 50, y: 300 },
     };
 
     setNodes((prev) => [...prev, newNode]);
   }
 
-  function addTelegramNode(): void {
+
+  function addTelegramNode(nodeData: TelegramNodeData) {
     const newNode: Node = {
       id: `${nodes.length + 1}`,
       type: "telegram-action",
-      data: {
-        label: "Telegram",
-        actionType: "telegram",
-      },
+      data: nodeData,
       position: { x: 300, y: 300 },
     };
 
@@ -121,14 +117,11 @@ export default function WorkflowComponent({
     console.log(edges);
   }
 
-  function addEmailNode(): void {
+  function addEmailNode(nodeData: EmailNodeData) {
     const newNode: Node = {
       id: `${nodes.length + 1}`,
       type: "email-action",
-      data: {
-        label: "Email",
-        actionType: "email",
-      },
+      data: nodeData,
       position: { x: 300, y: 300 },
     };
 
@@ -140,14 +133,18 @@ export default function WorkflowComponent({
   async function saveWorkflow() {
     const workflow = {
       nodes: nodes,
-      connections: edges
-    }
-    const res = await axios.put(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/workflow/${workflowId}`, workflow, {
-      headers: {
-        Authorization: `${localStorage.getItem('token')}`
+      connections: edges,
+    };
+    const res = await axios.put(
+      `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/workflow/${workflowId}`,
+      workflow,
+      {
+        headers: {
+          Authorization: `${localStorage.getItem("token")}`,
+        },
       }
-    })
-    console.log('response : ', res.data)
+    );
+    console.log("response : ", res.data);
   }
 
   if (loading) {
@@ -174,7 +171,7 @@ export default function WorkflowComponent({
             proOptions={{ hideAttribution: true }}
             nodeTypes={nodeTypes}
             deleteKeyCode="Delete"
-            multiSelectionKeyCode="Shift"  
+            multiSelectionKeyCode="Shift"
             fitView
           >
             <Background />
@@ -190,16 +187,17 @@ export default function WorkflowComponent({
             >
               Manual
             </button>
-            <button
+            {/* <button
               onClick={addWebhookTriggerNode}
               className="bg-neutral-700 w-full px-4 py-4 rounded-2xl hover:cursor-pointer text-start mb-5"
             >
               Webhook
-            </button>
+            </button> */}
+            <WebhookAction name="Webhook" handleNodeClick={addWebhookTriggerNode} />
             <p>Actions</p>
             <div className="w-full bg-neutral-600 h-0.5 my-3"></div>
             <TelegramAction name="Telegram" handleNodeClick={addTelegramNode} />
-            <TelegramAction name="Email" handleNodeClick={addEmailNode} />
+            <EmailAction name="Email" handleNodeClick={addEmailNode} />
           </div>
           <button
             onClick={saveWorkflow}
