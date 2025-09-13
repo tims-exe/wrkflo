@@ -4,6 +4,7 @@ import { AppDataSource } from './config/data-source.js'
 import { userRouter } from './routes/user.js'
 import { workflowRouter } from './routes/workflow.js'
 import { authMiddleware } from './routes/authMiddleware.js'
+import { credRouter } from './routes/credentials.js'
 
 const app = express()
 app.use(express.json())
@@ -20,6 +21,7 @@ app.get('/', (req, res) => {
 
 app.use('/api/v1/users', userRouter)
 app.use('/api/v1/workflow', authMiddleware, workflowRouter)
+app.use('/api/v1/credentials', authMiddleware, credRouter)
 
 
 AppDataSource.initialize()

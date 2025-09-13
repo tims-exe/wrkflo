@@ -33,3 +33,10 @@ export interface ConnectionData {
     outputIndex: number;
     inputIndex: number;
 }
+
+
+export interface CredentialTypes {
+    userId: string
+    app: string
+    key: string
+}

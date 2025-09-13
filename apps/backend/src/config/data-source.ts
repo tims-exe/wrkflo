@@ -5,6 +5,8 @@ import "reflect-metadata";
 import { Workflow } from "../entities/Workflow.js";
 import { NodeEntity } from "../entities/Node.js";
 import { ConnectionEntity } from "../entities/Connection.js";
+import { Credential } from "../entities/Credentials.js";
+
 dotenv.config()
 
 export const AppDataSource = new DataSource({
@@ -12,5 +14,5 @@ export const AppDataSource = new DataSource({
     url: process.env.MONGODB_URI,
     synchronize: true,
     logging: true,
-    entities: [User, Workflow, NodeEntity, ConnectionEntity]
+    entities: [User, Workflow, NodeEntity, ConnectionEntity, Credential]
 })
