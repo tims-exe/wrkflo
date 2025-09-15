@@ -191,26 +191,30 @@ export default function WorkflowComponent({
                 </TabsTrigger>
               </TabsList>
               
-              <TabsContent value="triggers" className="space-y-4 mt-6">
+              <TabsContent value="triggers" className="space-y-4 mt-6 text-sm">
                 <button
                   onClick={addManualTriggerNode}
                   className="bg-neutral-900 border-2 border-neutral-600 hover:bg-neutral-800 w-full px-4 py-4 rounded-2xl transition-colors text-start"
                 >
-                  Manual
+                  
+                  <p>
+                    Manual Trigger
+                  </p>
                 </button>
                 <WebhookAction
-                  name="Webhook"
+                  name="Webhook Trigger"
                   handleNodeClick={addWebhookTriggerNode}
+                  w_id={workflowId}
                 />
               </TabsContent>
               
-              <TabsContent value="actions" className="space-y-4 mt-6">
+              <TabsContent value="actions" className="space-y-4 mt-6 text-sm">
                 <TelegramAction name="Telegram" handleNodeClick={addTelegramNode} />
                 <EmailAction name="Email" handleNodeClick={addEmailNode} />
-                <AiAction name="Agent" handleNodeClick={addAgentNode} />
+                <AiAction name="AI Agent" handleNodeClick={addAgentNode} />
               </TabsContent>
               
-              <TabsContent value="tools" className="space-y-4 mt-6">
+              <TabsContent value="tools" className="space-y-4 mt-6 text-sm">
                 <ModelAction name="Model" handleNodeClick={addModelNode} />
                 <GetToolAction name="Tool" handleNodeClick={addGetTool} />
               </TabsContent>

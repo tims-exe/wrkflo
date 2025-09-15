@@ -17,6 +17,7 @@ export interface WebhookNodeData extends Record<string, unknown> {
   label: "Webhook",
   triggerType: "webhook",
   url: string
+  type: "GET" | "POST"
 }
 
 export interface AiNodeData extends Record<string, unknown> {
