@@ -41,7 +41,7 @@ export default function WorkflowDashboard() {
   }
 
   return (
-    <div className="flex flex-col gap-5 items-start mt-20 mx-10">
+    <div className="flex flex-col gap-5 items-start my-5">
         {currentWorkflows && currentWorkflows.map((w, index) => (
             <WorkflowCard key={index} wrkflo={w} onDelete={handleDeleteWorkflow}/>
         ))}

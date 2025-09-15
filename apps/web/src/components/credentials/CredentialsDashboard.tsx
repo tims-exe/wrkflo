@@ -1,4 +1,4 @@
-"use client"
+"use client";
 
 import {
   Table,
@@ -7,14 +7,14 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "@/components/ui/table"
-import { useCredentials } from "@/hooks/useCreds"
+} from "@/components/ui/table";
+import { useCredentials } from "@/hooks/useCreds";
 
 export default function CredentialsDashboard() {
-  const { credentials, handleDeleteCred } = useCredentials()
+  const { credentials, handleDeleteCred } = useCredentials();
 
   return (
-    <Table>
+    <Table className="text-lg">
       <TableHeader>
         <TableRow>
           <TableHead>Credentials</TableHead>
@@ -30,7 +30,7 @@ export default function CredentialsDashboard() {
             <TableCell>{c.app}</TableCell>
             <TableCell>{c.key}</TableCell>
             <TableCell className="text-right">
-              <button 
+              <button
                 onClick={() => handleDeleteCred(c._id)}
                 className="hover:cursor-pointer text-red-400"
               >
@@ -41,5 +41,5 @@ export default function CredentialsDashboard() {
         ))}
       </TableBody>
     </Table>
-  )
+  );
 }

@@ -33,6 +33,7 @@ import {
 } from "@/components/ui/tabs";
 import Image from "next/image";
 import { useWorkflowNodes } from "@/hooks/useWorkflowNodes";
+import Navbar from "../main/Navbar";
 
 const nodeTypes = {
   "telegram-action": TelegramNode,
@@ -130,7 +131,8 @@ export default function WorkflowComponent({
 
   return (
     <div>
-      <p className="mb-5">workflow {worflow?.name}</p>
+      <Navbar title={`Worflow ${worflow?.name}`}/>
+      <div className="px-10">
       <div className="flex w-full gap-10">
         <div className="w-full h-[600px] border-2 border-neutral-500 rounded-2xl">
           <ReactFlow
@@ -223,6 +225,7 @@ export default function WorkflowComponent({
           </button>
         </div>
       </div>
+    </div>
     </div>
   );
 }

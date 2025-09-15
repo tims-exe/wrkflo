@@ -9,7 +9,7 @@ export default function Button({ name, url}: {
     return <button onClick={() => {
         redirect(url)
     }}
-    className="bg-neutral-800 rounded-2xl px-5 py-2 hover:bg-neutral-700 hover:cursor-pointer transition-colors duration-200">
+    className="bg-neutral-950 border-2 border-neutral-600 rounded-2xl px-5 py-2 hover:bg-neutral-800 hover:cursor-pointer transition-colors duration-200">
         { name }
     </button>
 }
