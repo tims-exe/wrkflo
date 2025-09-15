@@ -3,8 +3,9 @@ import { ActionNodeType } from "../../../types/nodes";
 import EmailAction from "../actions/EmailAction";
 import TelegramAction from "../actions/TelegramAction";
 import { EmailNodeData, TelegramNodeData } from "types";
+import Image from "next/image";
 
-export default function ActionNode({ data, id }: NodeProps<ActionNodeType>) {
+export default function ActionNode({ data, id, selected }: NodeProps<ActionNodeType>) {
   const { setNodes, deleteElements } = useReactFlow();
 
   const handleDelete = () => {
@@ -29,17 +30,25 @@ export default function ActionNode({ data, id }: NodeProps<ActionNodeType>) {
   };
 
   const getBackgroundColor = () => {
-    if (data.actionType === "telegram") return "bg-blue-900";
-    if (data.actionType === "email") return "bg-green-900";
+    if (data.actionType === "telegram") return "bg-blue-950";
+    if (data.actionType === "email") return "bg-green-950";
     return "bg-neutral-700";
+  };
+
+  const getBorderClasses = () => {
+    if (selected) {
+      if (data.actionType === "telegram") return "border-2 border-blue-800";
+      if (data.actionType === "email") return "border-2 border-green-800";
+      return "border-2 border-neutral-500";
+    }
+    return "border-2 border-transparent";
   };
 
   return (
     <div
-      className={`${getBackgroundColor()} rounded-2xl text-white p-3 shadow-md w-[200px] flex justify-between items-center py-5`}
+      className={`${getBackgroundColor()} ${getBorderClasses()} rounded-2xl text-white p-3 shadow-md w-[100px] flex justify-center items-center py-5 transition-all duration-200 relative`}
     >
       <Handle type="target" position={Position.Left} id="target-left" />
-      <p className="font-bold">{data.label}</p>
 
       {data.actionType === "email" ? (
         <EmailAction
@@ -48,7 +57,12 @@ export default function ActionNode({ data, id }: NodeProps<ActionNodeType>) {
           existingData={data}
         >
           <button className="hover:cursor-pointer rounded transition-colors">
-            =
+            <Image
+              src={`/images/${data.actionType}.png`}
+              alt=""
+              width={30}
+              height={30}
+            />
           </button>
         </EmailAction>
       ) : data.actionType === "telegram" ? (
@@ -58,7 +72,12 @@ export default function ActionNode({ data, id }: NodeProps<ActionNodeType>) {
           existingData={data}
         >
           <button className="hover:cursor-pointer rounded transition-colors">
-            =
+            <Image
+              src={`/images/${data.actionType}.png`}
+              alt=""
+              width={30}
+              height={30}
+            />
           </button>
         </TelegramAction>
       ) : (
@@ -67,6 +86,16 @@ export default function ActionNode({ data, id }: NodeProps<ActionNodeType>) {
           className="hover:cursor-pointer rounded transition-colors"
         >
           x
+        </button>
+      )}
+
+      {selected && (
+        <button
+          onClick={handleDelete}
+          className="absolute -top-2 -right-2 bg-red-500 hover:bg-red-600 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs font-bold transition-colors z-10"
+          title="Delete node"
+        >
+          ×
         </button>
       )}
 

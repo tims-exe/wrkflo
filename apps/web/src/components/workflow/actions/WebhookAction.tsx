@@ -44,7 +44,7 @@ export default function WebhookAction({
         {children ? (
           children
         ) : (
-          <button className="bg-neutral-700 w-full px-4 py-4 rounded-2xl hover:cursor-pointer text-start mb-5">
+          <button className="bg-neutral-900 border-2 border-neutral-600 hover:bg-neutral-800 w-full px-4 py-4 rounded-2xl hover:cursor-pointer text-start mb-5">
             {name}
           </button>
         )}

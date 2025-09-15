@@ -22,18 +22,20 @@ export interface WebhookNodeData extends Record<string, unknown> {
 export interface AiNodeData extends Record<string, unknown> {
   label: string,
   systemPrompt: string,
-  actionType: 'agent-action'
+  actionType: 'agent'
 }
 
 export interface ModelNodeData extends Record<string, unknown> {
   label: string,
   apiKey: string,
   model: string,
+  toolType: 'gemini'
 }
 
 export interface ToolNodeData extends Record<string, unknown>{
   label: string,
   type: string
+  toolType: 'get'
 }
 
 export interface WorkflowData {

@@ -19,20 +19,20 @@ import TelegramAction from "./actions/TelegramAction";
 import axios from "axios";
 import { WorkflowResponseData } from "@/types/workflow";
 import EmailAction from "./actions/EmailAction";
-import {
-  AiNodeData,
-  EmailNodeData,
-  ModelNodeData,
-  TelegramNodeData,
-  ToolNodeData,
-  WebhookNodeData,
-} from "types";
 import WebhookAction from "./actions/WebhookAction";
 import AiAction from "./actions/AiAction";
 import AiNode from "./nodes/AiNode";
 import ModelAction from "./actions/ModelAction";
 import GetToolAction from "./actions/GetToolAction";
 import AgentToolNode from "./nodes/AgentToolNode";
+import {
+  Tabs,
+  TabsContent,
+  TabsList,
+  TabsTrigger,
+} from "@/components/ui/tabs";
+import Image from "next/image";
+import { useWorkflowNodes } from "@/hooks/useWorkflowNodes";
 
 const nodeTypes = {
   "telegram-action": TelegramNode,
@@ -47,8 +47,6 @@ const nodeTypes = {
 const initialNodes: Node[] = [];
 const initialEdges: Edge[] = [];
 
-type SidebarView = "main" | "triggers" | "actions" | "tools";
-
 export default function WorkflowComponent({
   workflowId,
 }: {
@@ -58,7 +56,16 @@ export default function WorkflowComponent({
   const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges);
   const [worflow, setWorkflow] = useState<WorkflowResponseData>();
   const [loading, setLoading] = useState(true);
-  const [sidebarView, setSidebarView] = useState<SidebarView>("main");
+
+  const {
+    addManualTriggerNode,
+    addWebhookTriggerNode,
+    addTelegramNode,
+    addEmailNode,
+    addAgentNode,
+    addModelNode,
+    addGetTool,
+  } = useWorkflowNodes({ nodes, setNodes });
 
   useEffect(() => {
     const fetchCurrentWorkflow = async () => {
@@ -96,106 +103,6 @@ export default function WorkflowComponent({
     console.log("deleted edges:", deletedEdges);
   }, []);
 
-  const getNextNodeId = (nodes: Node[]) => {
-    const existingIds = nodes
-      .map((node) => parseInt(node.id))
-      .filter((id) => !isNaN(id));
-    let nextId = 1;
-    while (existingIds.includes(nextId)) {
-      nextId++;
-    }
-    return nextId.toString();
-  };
-
-  function addManualTriggerNode(): void {
-    const newNode: Node = {
-      id: getNextNodeId(nodes),
-      type: "manual-trigger",
-      data: {
-        label: "Manual Trigger",
-        triggerType: "manual",
-      },
-      position: { x: 50, y: 300 },
-    };
-
-    setNodes((prev) => [...prev, newNode]);
-  }
-
-  function addWebhookTriggerNode(nodeData: WebhookNodeData) {
-    const newNode: Node = {
-      id: getNextNodeId(nodes),
-      type: "webhook-trigger",
-      data: nodeData,
-      position: { x: 50, y: 300 },
-    };
-
-    setNodes((prev) => [...prev, newNode]);
-  }
-
-  function addTelegramNode(nodeData: TelegramNodeData) {
-    const newNode: Node = {
-      id: getNextNodeId(nodes),
-      type: "telegram-action",
-      data: nodeData,
-      position: { x: 300, y: 300 },
-    };
-
-    setNodes((prev) => [...prev, newNode]);
-  }
-
-  function addEmailNode(nodeData: EmailNodeData) {
-    const newNode: Node = {
-      id: getNextNodeId(nodes),
-      type: "email-action",
-      data: nodeData,
-      position: { x: 300, y: 300 },
-    };
-
-    setNodes((prev) => [...prev, newNode]);
-  }
-
-  function addAgentNode(nodeData: AiNodeData) {
-    const newNode: Node = {
-      id: getNextNodeId(nodes),
-      type: "agent-action",
-      data: nodeData,
-      position: {
-        x: 300,
-        y: 300,
-      },
-    };
-
-    setNodes((prev) => [...prev, newNode]);
-  }
-
-  function addModelNode(nodeData: ModelNodeData) {
-    const newNode: Node = {
-      id: getNextNodeId(nodes),
-      type: "model-tool",
-      data: nodeData,
-      position: {
-        x: 300,
-        y: 300,
-      },
-    };
-
-    setNodes((prev) => [...prev, newNode]);
-  }
-
-  function addGetTool(nodeData: ToolNodeData) {
-    const newNode: Node = {
-      id: getNextNodeId(nodes),
-      type: "get-tool",
-      data: nodeData,
-      position: {
-        x: 300,
-        y: 300,
-      },
-    };
-
-    setNodes((prev) => [...prev, newNode]);
-  }
-
   async function saveWorkflow() {
     const workflow = {
       nodes: nodes,
@@ -212,101 +119,6 @@ export default function WorkflowComponent({
     );
     console.log("response : ", res.data);
   }
-
-  const renderSidebarContent = () => {
-    switch (sidebarView) {
-      case "main":
-        return (
-          <div className="space-y-4">
-            <h3 className="text-lg font-medium mb-4 text-center">Nodes</h3>
-            <button
-              onClick={() => setSidebarView("triggers")}
-              className="bg-neutral-700 w-full px-4 py-4 rounded-2xl hover:bg-neutral-600 transition-colors text-start"
-            >
-              Triggers
-            </button>
-            <button
-              onClick={() => setSidebarView("actions")}
-              className="bg-neutral-700 w-full px-4 py-4 rounded-2xl hover:bg-neutral-600 transition-colors text-start"
-            >
-              Actions
-            </button>
-            <button
-              onClick={() => setSidebarView("tools")}
-              className="bg-neutral-700 w-full px-4 py-4 rounded-2xl hover:bg-neutral-600 transition-colors text-start"
-            >
-              Tools
-            </button>
-          </div>
-        );
-
-      case "triggers":
-        return (
-          <div className="space-y-4">
-            <div className="flex items-center justify-between mb-4">
-              <button
-                onClick={() => setSidebarView("main")}
-                className="p-2 hover:bg-neutral-700 rounded-lg transition-colors"
-              >
-                ✕
-              </button>
-              <h3 className="text-lg font-medium">Triggers</h3>
-              <div className="w-10"></div> {/* Spacer for centering */}
-            </div>
-            <button
-              onClick={addManualTriggerNode}
-              className="bg-neutral-700 w-full px-4 py-4 rounded-2xl hover:bg-neutral-600 transition-colors text-start"
-            >
-              Manual
-            </button>
-            <WebhookAction
-              name="Webhook"
-              handleNodeClick={addWebhookTriggerNode}
-            />
-          </div>
-        );
-
-      case "actions":
-        return (
-          <div className="space-y-4">
-            <div className="flex items-center justify-between mb-4">
-              <button
-                onClick={() => setSidebarView("main")}
-                className="p-2 hover:bg-neutral-700 rounded-lg transition-colors"
-              >
-                ✕
-              </button>
-              <h3 className="text-lg font-medium">Actions</h3>
-              <div className="w-10"></div> {/* Spacer for centering */}
-            </div>
-            <TelegramAction name="Telegram" handleNodeClick={addTelegramNode} />
-            <EmailAction name="Email" handleNodeClick={addEmailNode} />
-            <AiAction name="Agent" handleNodeClick={addAgentNode} />
-          </div>
-        );
-
-      case "tools":
-        return (
-          <div className="space-y-4">
-            <div className="flex items-center justify-between mb-4">
-              <button
-                onClick={() => setSidebarView("main")}
-                className="p-2 hover:bg-neutral-700 rounded-lg transition-colors"
-              >
-                ✕
-              </button>
-              <h3 className="text-lg font-medium">Tools</h3>
-              <div className="w-10"></div> {/* Spacer for centering */}
-            </div>
-            <ModelAction name="Model" handleNodeClick={addModelNode} />
-            <GetToolAction name="Tool" handleNodeClick={addGetTool} />
-          </div>
-        );
-
-      default:
-        return null;
-    }
-  };
 
   if (loading) {
     return (
@@ -338,11 +150,69 @@ export default function WorkflowComponent({
             <Background />
           </ReactFlow>
         </div>
-
-        {/* Fixed Sidebar */}
         <div className="w-[300px] flex flex-col gap-5 h-[600px]">
           <div className="flex-1 bg-transparent border-2 rounded-2xl border-neutral-500 px-5 py-5 overflow-hidden">
-            {renderSidebarContent()}
+            <Tabs defaultValue="triggers" className="w-full h-full">
+              <TabsList className="grid w-full grid-cols-3 bg-transparent rounded-[10px] border-2 border-neutral-700 py-2 px-2 h-max">
+                <TabsTrigger 
+                  value="triggers" 
+                  className="data-[state=active]:bg-neutral-800 rounded-[6px]"
+                >
+                  <Image
+                    src="/images/triggers-icon.png"
+                    alt="Triggers"
+                    width={20}
+                    height={20}
+                  />
+                </TabsTrigger>
+                <TabsTrigger 
+                  value="actions"
+                  className="data-[state=active]:bg-neutral-800 rounded-[10px]"
+                >
+                  <Image
+                    src="/images/actions-icon.png"
+                    alt="Actions"
+                    width={20}
+                    height={20}
+                  />
+                </TabsTrigger>
+                <TabsTrigger 
+                  value="tools"
+                  className="data-[state=active]:bg-neutral-800 rounded-[10px]"
+                >
+                  <Image
+                    src="/images/tools-icon.png"
+                    alt="Tools"
+                    width={20}
+                    height={20}
+                  />
+                </TabsTrigger>
+              </TabsList>
+              
+              <TabsContent value="triggers" className="space-y-4 mt-6">
+                <button
+                  onClick={addManualTriggerNode}
+                  className="bg-neutral-900 border-2 border-neutral-600 hover:bg-neutral-800 w-full px-4 py-4 rounded-2xl transition-colors text-start"
+                >
+                  Manual
+                </button>
+                <WebhookAction
+                  name="Webhook"
+                  handleNodeClick={addWebhookTriggerNode}
+                />
+              </TabsContent>
+              
+              <TabsContent value="actions" className="space-y-4 mt-6">
+                <TelegramAction name="Telegram" handleNodeClick={addTelegramNode} />
+                <EmailAction name="Email" handleNodeClick={addEmailNode} />
+                <AiAction name="Agent" handleNodeClick={addAgentNode} />
+              </TabsContent>
+              
+              <TabsContent value="tools" className="space-y-4 mt-6">
+                <ModelAction name="Model" handleNodeClick={addModelNode} />
+                <GetToolAction name="Tool" handleNodeClick={addGetTool} />
+              </TabsContent>
+            </Tabs>
           </div>
 
           <button
