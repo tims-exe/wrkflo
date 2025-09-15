@@ -14,10 +14,11 @@ export interface EmailNodeData extends Record<string, unknown> {
 }
 
 export interface WebhookNodeData extends Record<string, unknown> {
-  label: "Webhook",
-  triggerType: "webhook",
+  label: "Webhook"
+  triggerType: "webhook"
   url: string
-  type: "GET" | "POST"
+  method: "GET" | "POST",
+  workflowId: string
 }
 
 export interface AiNodeData extends Record<string, unknown> {

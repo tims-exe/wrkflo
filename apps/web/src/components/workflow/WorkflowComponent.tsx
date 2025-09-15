@@ -58,15 +58,14 @@ export default function WorkflowComponent({
   const [worflow, setWorkflow] = useState<WorkflowResponseData>();
   const [loading, setLoading] = useState(true);
 
-  const {
-    addManualTriggerNode,
-    addWebhookTriggerNode,
-    addTelegramNode,
-    addEmailNode,
-    addAgentNode,
-    addModelNode,
-    addGetTool,
-  } = useWorkflowNodes({ nodes, setNodes });
+  const { addNode } = useWorkflowNodes({ nodes, setNodes });
+
+  const addManualTriggerNode = useCallback(() => {
+    addNode("manual-trigger", {
+      label: "Manual Trigger",
+      triggerType: "manual",
+    }, { x: 50, y: 300 });
+  }, [addNode]);
 
   useEffect(() => {
     const fetchCurrentWorkflow = async () => {
@@ -196,27 +195,41 @@ export default function WorkflowComponent({
                   onClick={addManualTriggerNode}
                   className="bg-neutral-900 border-2 border-neutral-600 hover:bg-neutral-800 w-full px-4 py-4 rounded-2xl transition-colors text-start"
                 >
-                  
                   <p>
                     Manual Trigger
                   </p>
                 </button>
                 <WebhookAction
                   name="Webhook Trigger"
-                  handleNodeClick={addWebhookTriggerNode}
+                  handleNodeClick={(data) => addNode("webhook-trigger", data)}
                   w_id={workflowId}
                 />
               </TabsContent>
               
               <TabsContent value="actions" className="space-y-4 mt-6 text-sm">
-                <TelegramAction name="Telegram" handleNodeClick={addTelegramNode} />
-                <EmailAction name="Email" handleNodeClick={addEmailNode} />
-                <AiAction name="AI Agent" handleNodeClick={addAgentNode} />
+                <TelegramAction 
+                  name="Telegram" 
+                  handleNodeClick={(data) => addNode("telegram-action", data)} 
+                />
+                <EmailAction 
+                  name="Email" 
+                  handleNodeClick={(data) => addNode("email-action", data)} 
+                />
+                <AiAction 
+                  name="AI Agent" 
+                  handleNodeClick={(data) => addNode("agent-action", data)} 
+                />
               </TabsContent>
               
               <TabsContent value="tools" className="space-y-4 mt-6 text-sm">
-                <ModelAction name="Model" handleNodeClick={addModelNode} />
-                <GetToolAction name="Tool" handleNodeClick={addGetTool} />
+                <ModelAction 
+                  name="Model" 
+                  handleNodeClick={(data) => addNode("model-tool", data)} 
+                />
+                <GetToolAction 
+                  name="Tool" 
+                  handleNodeClick={(data) => addNode("get-tool", data)} 
+                />
               </TabsContent>
             </Tabs>
           </div>

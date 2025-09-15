@@ -44,17 +44,16 @@ export default function WebhookAction({
   }
 
   const [url, setUrl] = useState<string>("");
+  const [secret, setSecret] = useState<string>("");
   const [apiMethod, setApiMethod] = useState<"GET" | "POST">("GET");
   const [isOpen, setIsOpen] = useState(false);
 
-  // Generate new URL when dialog opens and there's no existing data
   useEffect(() => {
     if (isOpen) {
       if (existingData?.url) {
         setUrl(existingData.url);
         setApiMethod(existingData.type as "GET" | "POST" || "GET");
       } else if (w_id) {
-        // Generate fresh URL each time dialog opens for new webhook
         setUrl(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/webhook/handler/${generateWebhookId(w_id)}`);
         setApiMethod("GET");
       }
@@ -66,7 +65,8 @@ export default function WebhookAction({
       label: "Webhook",
       triggerType: "webhook",
       url,
-      type: apiMethod,
+      method: apiMethod,
+      workflowId: w_id!
     };
     handleNodeClick(nodeData);
   };
