@@ -6,6 +6,7 @@ import { workflowRouter } from './routes/workflow.js'
 import { authMiddleware } from './routes/authMiddleware.js'
 import { credRouter } from './routes/credentials.js'
 import { whRouter } from './routes/webhook.js'
+import { executeRouter } from './routes/execution.js'
 
 const app = express()
 app.use(express.json())
@@ -24,6 +25,7 @@ app.use('/api/v1/users', userRouter)
 app.use('/api/v1/workflow', authMiddleware, workflowRouter)
 app.use('/api/v1/credentials', authMiddleware, credRouter)
 app.use('/api/v1/webhook', whRouter)
+app.use('/api/v1/execute', authMiddleware, executeRouter)
 // http://localhost:5000/api/v1/webhook/handler/68c80162c99d0a21dd5071ff--pwdmb
 
 

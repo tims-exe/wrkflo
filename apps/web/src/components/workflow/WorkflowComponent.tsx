@@ -64,6 +64,7 @@ export default function WorkflowComponent({
     addNode("manual-trigger", {
       label: "Manual Trigger",
       triggerType: "manual",
+      workflowId
     }, { x: 50, y: 300 });
   }, [addNode]);
 

@@ -3,6 +3,7 @@ import { TriggerNodeType } from "../../../types/nodes";
 import { WebhookNodeData } from "types";
 import WebhookAction from "../actions/WebhookAction";
 import Image from "next/image";
+import axios from "axios";
 
 export default function TriggerNode({ data, id, selected }: NodeProps<TriggerNodeType>) {
   const { setNodes, deleteElements } = useReactFlow();
@@ -35,6 +36,20 @@ export default function TriggerNode({ data, id, selected }: NodeProps<TriggerNod
     return "border-2 border-transparent";
   };
 
+  const handleManualTrigger = async () => {
+    try {
+      await axios.post(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/execute/run`, {
+        workflowId: data.workflowId
+      }, {
+        headers: {
+          Authorization: localStorage.getItem('token')
+        }
+      })
+    } catch (error) {
+      console.log(error)
+    }
+  }
+
   return (
     <div
       className={`${getBackgroundColor()} ${getBorderClasses()} rounded-2xl text-white p-3 shadow-md w-[100px] flex justify-center items-center py-5 transition-all duration-200 relative`}
@@ -60,7 +75,7 @@ export default function TriggerNode({ data, id, selected }: NodeProps<TriggerNod
 
       {data.triggerType === "manual" && (
         <button
-          onClick={() => {}}
+          onClick={handleManualTrigger}
           className="hover:cursor-pointer rounded transition-colors text-red-400 pr-2 pb-1"
         >
           <Image
