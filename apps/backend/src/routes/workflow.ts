@@ -90,7 +90,7 @@ workflowRouter.get('/:id', async (req, res) => {
     const workflowId = req.params.id;
 
     try {
-        const workflow = await workflowModel.getWorkflow(req.userId, workflowId);
+        const workflow = await workflowModel.getWorkflow(workflowId);
 
         if (!workflow) {
             return res.status(404).json({

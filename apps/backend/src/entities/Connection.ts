@@ -8,8 +8,8 @@ export class ConnectionEntity {
   target: string;
 
   @Column()
-  sourceHandle: string;
+  outputIndex: number;
 
   @Column()
-  targetHandle: string;
+  inputIndex: number;
 }

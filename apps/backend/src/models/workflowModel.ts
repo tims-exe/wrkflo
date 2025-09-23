@@ -19,10 +19,9 @@ export class WorkflowModel {
         });
     }
 
-    async getWorkflow(userId: string, workflowId: string) {
+    async getWorkflow(workflowId: string) {
         return await this.workflowRepo.findOne({
             where: {
-                userId,
                 _id: new ObjectId(workflowId)
             }
         })
@@ -49,6 +48,24 @@ export class WorkflowModel {
         );
 
         return result.modifiedCount > 0;
+    }
+
+    async findWorkflowByWebhookId(webhookId: string) {
+        const allWorkflows = await this.workflowRepo.find();
+        
+        for (const workflow of allWorkflows) {
+            console.log(workflow._id, workflow.nodes)
+            const webhookTrigger = workflow.nodes.find((node) => 
+                node.type === 'webhook-trigger' && 
+                (node.data.webhookId === webhookId || node.data.id === webhookId)
+            );
+            
+            if (webhookTrigger) {
+                return workflow;
+            }
+        }
+        
+        return null;
     }
 
 }

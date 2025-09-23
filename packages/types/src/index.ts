@@ -18,7 +18,7 @@ export interface WebhookNodeData extends Record<string, unknown> {
   triggerType: "webhook"
   url: string
   method: "GET" | "POST",
-  workflowId: string
+  workflowId: string,
 }
 
 export interface AiNodeData extends Record<string, unknown> {

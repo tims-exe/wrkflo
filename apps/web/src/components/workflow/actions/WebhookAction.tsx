@@ -66,7 +66,7 @@ export default function WebhookAction({
       triggerType: "webhook",
       url,
       method: apiMethod,
-      workflowId: w_id!
+      workflowId: w_id!,
     };
     handleNodeClick(nodeData);
   };
@@ -132,7 +132,7 @@ export default function WebhookAction({
           </Select>
 
           <p className="text-md text-neutral-400 mt-5">Webhook URL</p>
-          <p className="text-sm break-all border border-neutral-600 rounded-[15px] px-2 py-3 bg-neutral-900">
+          <p className="text-sm break-all border border-neutral-600 rounded-[15px] px-2 pt-4 py-3 bg-neutral-900">
             {url}
           </p>
           <button
