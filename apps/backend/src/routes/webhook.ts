@@ -41,13 +41,13 @@ whRouter.get('/handler/:id', async (req, res) => {
         console.log(`Executing workflow ${wh.workflowId} from webhook trigger`)
 
         // Execute the workflow
-        // const executionResult = await executeWorkflow(workflow, credentialModel)
+        const executionResult = await executeWorkflow(workflow, credentialModel)
 
         return res.json({
             success: true,
             message: 'Webhook triggered and workflow executed',
             webhook: wh,
-            // execution: executionResult
+            execution: executionResult
         })
 
     } catch (error) {

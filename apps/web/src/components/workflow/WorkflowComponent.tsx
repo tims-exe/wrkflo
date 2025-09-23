@@ -34,6 +34,9 @@ import {
 import Image from "next/image";
 import { useWorkflowNodes } from "@/hooks/useWorkflowNodes";
 import Navbar from "../main/Navbar";
+import { useDebounce } from "@/hooks/useDebounce";
+import { toast } from "sonner";
+import { CheckCircle2 } from "lucide-react";
 
 const nodeTypes = {
   "telegram-action": TelegramNode,
@@ -55,10 +58,59 @@ export default function WorkflowComponent({
 }) {
   const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes);
   const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges);
-  const [worflow, setWorkflow] = useState<WorkflowResponseData>();
+  const [workflow, setWorkflow] = useState<WorkflowResponseData>();
   const [loading, setLoading] = useState(true);
+  const [isInitialLoad, setIsInitialLoad] = useState(true);
+  const [saveStatus, setSaveStatus] = useState<'saved' | 'saving' | 'error'>('saved');
 
   const { addNode } = useWorkflowNodes({ nodes, setNodes });
+
+  // Create the save function
+  const saveWorkflow = useCallback(async () => {
+    // Don't save during initial load to prevent unnecessary API calls
+    if (isInitialLoad) return;
+
+    try {
+      setSaveStatus('saving');
+      
+      const workflowData = {
+        nodes: nodes,
+        connections: edges,
+      };
+      
+      const res = await axios.put(
+        `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/workflow/${workflowId}`,
+        workflowData,
+        {
+          headers: {
+            Authorization: `${localStorage.getItem("token")}`,
+          },
+        }
+      );
+      
+      if (res.data.success) {
+        setSaveStatus('saved');
+        console.log("Workflow auto-saved:", res.data);
+        
+        // Show success toast
+        toast("Wrkflo Saved!", {
+          icon: <CheckCircle2 className="w-5 h-5 text-green-500" />,
+          style: {
+            background: "black",
+            color: "white",
+            border: "1px solid #333",
+          },
+        });
+      } else {
+        setSaveStatus('error');
+      }
+    } catch (error) {
+      console.error("Auto-save error:", error);
+      setSaveStatus('error');
+    }
+  }, [nodes, edges, workflowId, isInitialLoad]);
+
+  useDebounce(saveWorkflow, 2000);
 
   const addManualTriggerNode = useCallback(() => {
     addNode("manual-trigger", {
@@ -70,31 +122,39 @@ export default function WorkflowComponent({
 
   useEffect(() => {
     const fetchCurrentWorkflow = async () => {
-      const res = await axios.get(
-        `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/workflow/${workflowId}`,
-        {
-          headers: {
-            Authorization: `${localStorage.getItem("token")}`,
-          },
-        }
-      );
+      try {
+        const res = await axios.get(
+          `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/workflow/${workflowId}`,
+          {
+            headers: {
+              Authorization: `${localStorage.getItem("token")}`,
+            },
+          }
+        );
 
-      if (res.data.success) {
-        const wf = res.data.workflow;
-        setWorkflow(wf);
-        setNodes(wf.nodes);
-        setEdges(wf.connections);
+        if (res.data.success) {
+          const wf = res.data.workflow;
+          setWorkflow(wf);
+          setNodes(wf.nodes);
+          setEdges(wf.connections);
+          setLoading(false);
+          console.log(wf.nodes.length);
+          
+          // Mark initial load as complete after a short delay
+          setTimeout(() => setIsInitialLoad(false), 100);
+        }
+      } catch (error) {
+        console.error("Error fetching workflow:", error);
         setLoading(false);
-        console.log(wf.nodes.length);
       }
     };
 
     fetchCurrentWorkflow();
-  }, []);
+  }, [workflowId]);
 
   const onConnect = useCallback((connection: Connection) => {
     setEdges((prevEdges) => addEdge(connection, prevEdges));
-  }, []);
+  }, [setEdges]);
 
   const onNodesDelete = useCallback((deletedNodes: Node[]) => {
     console.log("deleted nodes:", deletedNodes);
@@ -104,22 +164,10 @@ export default function WorkflowComponent({
     console.log("deleted edges:", deletedEdges);
   }, []);
 
-  async function saveWorkflow() {
-    const workflow = {
-      nodes: nodes,
-      connections: edges,
-    };
-    const res = await axios.put(
-      `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/workflow/${workflowId}`,
-      workflow,
-      {
-        headers: {
-          Authorization: `${localStorage.getItem("token")}`,
-        },
-      }
-    );
-    console.log("response : ", res.data);
-  }
+  // Manual save function (keeping the original button functionality)
+  const handleManualSave = useCallback(async () => {
+    await saveWorkflow();
+  }, [saveWorkflow]);
 
   if (loading) {
     return (
@@ -131,7 +179,7 @@ export default function WorkflowComponent({
 
   return (
     <div>
-      <Navbar title={`Worflow ${worflow?.name}`}/>
+      <Navbar title={`Workflow ${workflow?.name}`}/>
       <div className="px-10">
       <div className="flex w-full gap-10">
         <div className="w-full h-[600px] border-2 border-neutral-500 rounded-2xl">
@@ -235,12 +283,14 @@ export default function WorkflowComponent({
             </Tabs>
           </div>
 
-          <button
-            onClick={saveWorkflow}
-            className="h-1/9 border-2 rounded-2xl border-neutral-500 py-3 hover:cursor-pointer hover:bg-neutral-800 duration-200 transition-colors"
-          >
-            Save
-          </button>
+          
+            <button
+              onClick={handleManualSave}
+              disabled={saveStatus === 'saving'}
+              className="w-full h-1/9 border-2 rounded-2xl border-neutral-500 py-3 hover:cursor-pointer hover:bg-neutral-800 duration-200 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              {saveStatus === 'saving' ? 'Saving...' : 'Save'}
+            </button>
         </div>
       </div>
     </div>

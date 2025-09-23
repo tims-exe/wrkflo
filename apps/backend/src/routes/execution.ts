@@ -26,7 +26,7 @@ executeRouter.post('/run', async (req, res) => {
 
     try {
         const currentWorkflow = await workflowModel.getWorkflow(workflowId)
-        console.log('workflow : ', currentWorkflow)
+        // console.log('workflow : ', currentWorkflow)
 
         if (!currentWorkflow) {
             return res.json({
@@ -35,7 +35,7 @@ executeRouter.post('/run', async (req, res) => {
             })
         }
 
-        console.log('curr workflow : ', currentWorkflow)
+        // console.log('curr workflow : ', currentWorkflow)
         // Execute the workflow
         const result = await executeWorkflow(currentWorkflow, credentialModel)
         
