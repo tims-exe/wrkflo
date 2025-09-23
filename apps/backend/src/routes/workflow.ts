@@ -114,40 +114,42 @@ workflowRouter.get('/:id', async (req, res) => {
 
 
 
-// update workflow nodes and edges
+// update entire workflow
 workflowRouter.put('/:id', authMiddleware, async (req, res) => {
     try {
         const workflowId = req.params.id;
-        const { nodes, connections } = req.body;
+        const userId = req.userId;
+        const newWorkflowData = req.body; // full workflow object
 
-        if (!workflowId) {
+        if (!workflowId || !userId) {
             return res.json({
                 success: false,
-                message: " no workflow id"
-            })
+                message: "Missing workflow or user id"
+            });
         }
 
-        const result = await workflowModel.updateWorkflow(workflowId, { nodes, connections });
+        const result = await workflowModel.replaceWorkflow(workflowId, userId, newWorkflowData);
 
         if (!result) {
             return res.json({
                 success: false,
-                message: "failed updating workflow"
+                message: "Failed updating workflow"
             });
         }
 
         return res.json({
             success: true,
-            message: "updated workflow successfully"
+            message: "Updated workflow successfully"
         });
     } catch (error) {
         console.error(error);
         return res.status(500).json({
             success: false,
-            message: "error updating workflow"
+            message: "Error updating workflow"
         });
     }
 });
+
 
 
 

@@ -41,4 +41,14 @@ export class WorkflowModel {
             userId
         });
     }
+
+    async replaceWorkflow(workflowId: string, userId: string, workflowData: WorkflowData) {
+        const result = await this.workflowRepo.updateOne(
+            { _id: new ObjectId(workflowId), userId },
+            { $set: { ...workflowData, updatedAt: new Date() } }
+        );
+
+        return result.modifiedCount > 0;
+    }
+
 }
